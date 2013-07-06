@@ -19,60 +19,22 @@
         </div>
     </header>    
     <div class="content">
-		<?php if (isset($_GET["Valve"])) { ?>
-			<?php $Valve = GetValvesList()[$_GET["Valve"]]; ?>
-			<table class=center style="margin-top:10px; margin-bottom:0px"><tr>
-				<td class=valve_image style=width:72px><img src="<?=$Valve->params['General']['Image']?>"/></td>
-				<td style="vertical-align:middle; padding:0 10px 0 10px"><h1><?=$Valve->params['General']['Name']?></h1></td>
-			</tr></table>
-			<form action="" method="post" name="ValveConfig"><table style="width:100%; table-layout:fixed; margin:10px">
-			<colgroup><col style="width:10%"></colgroup>
-			<tr><td colspan=3><div class=center style="width:80%">
-				<?php if ($Valve->IsOpen()) { ?>
-					<input type="submit" name="Close" value="Close NOW" class=manual_closed style="width:100%;height:40px;font-size:20px">
-				<?php } else { ?>
-					<input type="submit" name="Open" value="Open NOW" class=manual_opened style="width:100%;height:40px;font-size:20px">
-				<?php } ?>
-				</div></td></tr>
-			<tr><td colspan=2><div style="margin-top:10px; margin-bottom:0px">Use automatic scheduling?</div></td>
-				<td><select name="Auto">
-					<option value="1" <?php if ($Valve->params['Status']['Auto']) echo 'selected' ?> >Yes</option>
-					<option value="0" <?php if (!$Valve->params['Status']['Auto']) echo 'selected' ?> >No</option>
-				</select></td></tr>
-			<tr><td></td>
-				<td>Open at</td>
-				<td><input type="time" name="AutoAt" value="<?=$Valve->FormatAutoTime()?>"></td></tr>
-			<tr><td></td>
-				<td>Days in between</td>
-				<td><select name="AutoInterval">
-					<?php for ($i=1;$i<=10;$i++) {
-						echo "<option value=\"$i\"";
-						if ($Valve->params['Auto']['Interval'] == "P{$i}D") { echo " selected"; }
-						echo ">$i</option>";
-					} ?>
-				</select></td></tr>
-			<tr><td></td>
-				<td>Open for</td>
-				<td><input type="time" name="AutoDuration" value="<?=$Valve->FormatAutoDuration()?>"></td></tr>
-			<tr><td colspan=2><div style="margin-top:10px; margin-bottom:0px">Use manual scheduling?</div></td>
-				<td><select name="Manual">
-					<option value="1" <?php if ($Valve->params['Status']['Manual']) echo 'selected' ?> >Yes</option>
-					<option value="0" <?php if (!$Valve->params['Status']['Manual']) echo 'selected' ?> >No</option>
-				</select></td></tr>
-			<tr><td></td>
-				<td>Open at</td>
-				<td><input type="date" name="ManualAtDate" value="<?=$Valve->FormatManualDate()?>">
-					<input type="time" name="ManualAtTime" value="<?=$Valve->FormatManualTime()?>"></td></tr>
-			<tr><td></td>
-				<td>Open for</td>
-				<td><input type="time" name="ManualDuration" value="<?=$Valve->FormatManualDuration()?>"></td></tr>
-			<tr><td colspan=3>
-				<div class=center style="width:40%;margin-top:10px">
-					<input type="submit" name="Save" value="Save" class="status" style="width:100%;height:30px;font-size:16px">
-				</div></td></tr>
-			</table>
-			</form>
-		<?php } else { ?>
+		<?php
+		$menu = true;
+		if (isset($_GET["Valve"])) {
+			$Valve = GetValvesList()[$_GET["Valve"]];
+			if (isset($_POST["Open"])) {
+				$Valve->ManualOpenNow();
+			} elseif (isset($_POST["Close"])) {
+				$Valve->DoClose();
+			} elseif (isset($_POST["Save"])) {
+				$Valve->UpdateParamsFromForm();
+			} else { 
+				$Valve->GenerateParamsForm();
+				$menu = false;
+			}
+		}
+		if ($menu) { ?>
 			<nav class="vertical menu">
 				<ul>
 					<?php foreach(GetValvesList() as $key=>$valve){?>
@@ -89,10 +51,13 @@
         <p class="copy">
 		&copy; 2013 pi.micronen.mooo.com | All right reserved <br/>
 		Design By Ronen Michaeli micronen@gmail.com <br/>
-		Based on template by <a href="http://www.mobifreaks.com" title="Design By Mobifreaks.com">Mobifreaks.com</a><br/></p>
+		Based on template by <a href="http://www.mobifreaks.com" title="Mobifreaks.com">Mobifreaks.com</a><br/></p>
+		<div>
+		GET:<br><?php print_r($_GET) ?><br>
+		POST:<br><?php print_r($_POST) ?><br>
+		Valve:<br><?php print_r($Valve) ?><br>
+		</div>
 	</footer>
-	GET:<br><?php print_r($_GET) ?><br>
-	POST:<br><?php print_r($_POST) ?><br>
 </body>
 </html>
 	

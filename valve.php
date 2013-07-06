@@ -1,10 +1,17 @@
 <?php
 include_once 'ini_write.php';
+include_once 'mutex.php';
+
+function GetValvesList() {
+	$files = glob('/var/www-data/valves/*.ini');
+	foreach($files as $file) {	
+		$valves[] = new Valve($file);
+	}
+	return $valves;
+}
 
 class Valve
 {
-	const DIR = '/var/www-data/valves/';
-
 	const DATEDATEFORMAT = 'Y-m-d';
 	const DATETIMEFORMAT = 'H:i:s';
 	const DATEFORMAT = 'Y-m-d H:i:s';
@@ -47,13 +54,15 @@ class Valve
 	}
 	
 	function ReadINI() {
-		$params = parse_ini_file(self::DIR . $this->filename, true);
+		$mutex = new Mutex($this->filename);
+		$params = parse_ini_file($this->filename, true);
 		// Overrides defaults with values from the ini file.
 		$this->params = array_replace_recursive($this->params, $params);
 	}
 
 	function WriteINI() {
-		ini_write($this->params, self::DIR . $this->filename, true);		
+		$mutex = new Mutex($this->filename);
+		ini_write($this->params, $this->filename, true);		
 	}
 	
 	function IsOpen() {
@@ -217,14 +226,87 @@ class Valve
 		}
 		echo '</td></tr></table>';
 	}
-}
-
-function GetValvesList() {
-	$files = array_diff(scandir(Valve::DIR), array('..', '.'));
-	foreach($files as $file) {	
-		$valves[] = new Valve($file);
+	
+	function GenerateParamsForm() {
+		?>
+		<table class=center style="margin-top:10px; margin-bottom:0px"><tr>
+			<td class=valve_image style=width:72px><img src="<?=$this->params['General']['Image']?>"/></td>
+			<td style="vertical-align:middle; padding:0 10px 0 10px"><h1><?=$this->params['General']['Name']?></h1></td>
+			<td style="vertical-align:middle; padding:0 10px 0 10px; border-left:2px solid #e3f2f9;">
+				<?php if ($this->IsOpen()) {
+					$Op = 'Close'; $Class = 'closed';
+				} else {
+					$Op = 'Open'; $Class = 'opened';
+				}
+				?>
+				<input type="submit" name="<?=$Op?>" value="<?=$Op?>" class=manual_<?=$Class?> style="height:64px;font-size:20px; padding:0 10px 0 10px;">
+		</tr></table>
+			</td>
+		<form action="" method="post" name="ValveConfig"><table class=center style="table-layout:fixed; padding:10px">
+		<colgroup><col style="width:20px"><col style="width:200px"></colgroup>
+		<tr><td colspan=3><div style="margin:5px 0 5px 0px; border-top: 1px solid #eee;"></div></td></tr>
+		<tr><td colspan=2><div style="padding:0 0 0 10px">Use automatic scheduling?</div></td>
+			<td><select name="Auto">
+				<option value="1" <?php if ($this->params['Status']['Auto']) echo 'selected' ?> >Yes</option>
+				<option value="0" <?php if (!$this->params['Status']['Auto']) echo 'selected' ?> >No</option>
+			</select></td></tr>
+		<tr><td></td>
+			<td>Open at</td>
+			<td><input type="time" name="AutoAt" value="<?=$this->FormatAutoTime()?>"></td></tr>
+		<tr><td></td>
+			<td>Days in between</td>
+			<td><select name="AutoInterval">
+				<?php for ($i=1;$i<=50;$i++) {
+					echo "<option value=\"$i\"";
+					if ($this->params['Auto']['Interval'] == "P{$i}D") { echo " selected"; }
+					echo ">$i</option>";
+				} ?>
+			</select></td></tr>
+		<tr><td></td>
+			<td>Open for</td>
+			<td><input type="time" name="AutoDuration" value="<?=$this->FormatAutoDuration()?>"></td></tr>
+		<tr><td colspan=3><div style="margin:5px 0 5px 0px; border-top: 1px solid #eee;"></div></td></tr>
+		<tr><td colspan=2><div style="padding:0 0 0 10px">Use manual scheduling?</div></td>
+			<td><select name="Manual">
+				<option value="1" <?php if ($this->params['Status']['Manual']) echo 'selected' ?> >Yes</option>
+				<option value="0" <?php if (!$this->params['Status']['Manual']) echo 'selected' ?> >No</option>
+			</select></td></tr>
+		<tr><td></td>
+			<td>Open at</td>
+			<td><input type="date" name="ManualAtDate" value="<?=$this->FormatManualDate()?>">
+				<input type="time" name="ManualAtTime" value="<?=$this->FormatManualTime()?>"></td></tr>
+		<tr><td></td>
+			<td>Open for</td>
+			<td><input type="time" name="ManualDuration" value="<?=$this->FormatManualDuration()?>"></td></tr>
+		<tr><td colspan=3><div style="margin:5px 0 5px 0px; border-top: 1px solid #eee;"></div></td></tr>
+		<tr><td colspan=3><div class=center style="width:40%;margin-top:10px">
+			<input type="submit" name="Save" value="Save" class="status" style="width:100%;height:30px;font-size:16px">
+			</div></td></tr>
+		</table>
+		</form>
+		<?php
 	}
-	return $valves;
+
+	function UpdateParamsFromForm() {
+		$this->params["Status"]["Auto"] = $_POST["Auto"];
+		$this->params["Status"]["Manual"] = $_POST["Manual"];
+		list($h, $m) = sscanf($_POST["AutoDuration"], "%d:%d");
+		$this->params["Auto"]["Duration"] = "PT{$h}H{$m}M";
+		list($h, $m) = sscanf($_POST["AutoAt"], "%d:%d");
+		$this->params["Auto"]["At"] = "{$h}:{$m}";
+		$this->params["Auto"]["Interval"] = "P{$_POST["AutoInterval"]}D";
+		list($h, $m) = sscanf($_POST["ManualDuration"], "%d:%d");
+		$this->params["Manual"]["Duration"] = "PT{$h}H{$m}M";
+		$this->params["Manual"]["At"] = $_POST["ManualAtDate"] . ' ' . $_POST["ManualAtTime"];
+		$this->WriteINI();
+	}
+	
+	function ManualOpenNow() {
+		$this->params['Status']['Manual'] = 1;
+		$this->params['Manual']['At'] = (new DateTime())->format(self::DATEFORMAT);
+		$this->params['Manual']['Duration'] = 'PT1H0M';
+		$this->WriteINI();
+	}
 }
 
 function UpdateValves() {
