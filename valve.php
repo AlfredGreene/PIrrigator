@@ -1,6 +1,7 @@
 <?php
 include_once 'ini_write.php';
 include_once 'mutex.php';
+include_once 'ValveHW.php';
 
 function GetValvesList() {
 	$files = glob('/var/www-data/valves/*.ini');
@@ -13,7 +14,7 @@ function GetValvesList() {
 class Valve
 {
 	const DATEDATEFORMAT = 'Y-m-d';
-	const DATETIMEFORMAT = 'H:i:s';
+	const DATETIMEFORMAT = 'H:i';
 	const DATEFORMAT = 'Y-m-d H:i:s';
 
 	const DURATIONFORMAT = '%r%H:%I';
@@ -24,6 +25,7 @@ class Valve
 		"General" => [
 			"Name" => "Name",
 			"Image" => "http://lorempixel.com/64/64",
+			"HWID" => 0,
 			],
 		"Auto" => [
 			"Duration" => "PT1H0M",
@@ -37,7 +39,6 @@ class Valve
 		"Status" => [
 			"Manual" => false,
 			"Auto" => true,
-			"Open" => false,
 			"Start" => "",
 			],
 		"History" => [
@@ -47,8 +48,11 @@ class Valve
 		];
 		
 	public $filename;
+	
+	private $HW;
 
 	function __construct($filename) {
+		$this->HW = new ValveHW;
 		$this->filename = $filename;
 		$this->ReadINI();
 	}
@@ -66,45 +70,46 @@ class Valve
 	}
 	
 	function IsOpen() {
-		return $this->params["Status"]["Open"];
+		return $this->HW->IsOpen($this->params["General"]["HWID"]);
 	}
 	
 	function DoOpen() {
-		if (!$this->params['Status']['Open']) {
+		if (!$this->IsOpen() && $this->CanOpen()) {
 			echo 'Opening ' . $this->params['General']['Name'] . "\n";
-			$this->params['Status']['Open'] = true;
+			$this->HW->Open($this->params["General"]["HWID"]);
 			$this->params['Status']['Start'] = (new DateTime())->format(self::DATEFORMAT);
+			$this->WriteINI();
 		}
 	}
 
 	function DoClose() {
-		if ($this->params['Status']['Open']) {
+		if ($this->IsOpen()) {
 			echo 'Closeing ' . $this->params['General']['Name'] . "\n";
-			$this->params['Status']['Open'] = false;
+			$this->HW->Close($this->params["General"]["HWID"]);
 			$start = DateTime::createFromFormat(self::DATEFORMAT, $this->params["Status"]["Start"]);
 			$duration = $start->diff(new DateTime());
 			$this->params['History']['Dates'][] = $this->params['Status']['Start'];
-			$this->params['History']['Durations'][] = $duration->format(self::DURATIONLONGFORMAT);
-			
+			$this->params['History']['Durations'][] = $duration->format(self::DURATIONLONGFORMAT);			
 			$this->params['Status']['Manual'] = false;
+			$this->WriteINI();
 		}
 	}
 
 	function ShouldOpen() {
-//		echo 'TimeToOpen ' . $this->params['General']['Name'] . "\n";
-//		print_r($this->TimeToOpen());
 		$TimeToOpen = $this->TimeToOpen();
 		if (is_null($TimeToOpen)) {
 			return false;
 		} else {
-			return $this->TimeToOpen()->invert;
+			return !$this->IsOpen() && $this->TimeToOpen()->invert;
 		}
+	}
+	
+	function CanOpen() {
+		return $this->HW->CanOpen($this->params["General"]["HWID"]);
 	}
 
 	function ShouldClose() {
-//		echo 'TimeToClose ' . $this->params['General']['Name'] . "\n";
-//		print_r($this->TimeToClose());
-		return $this->TimeToClose()->invert;
+		return $this->IsOpen() && $this->TimeToClose()->invert;
 	}
 	
 	function FormatAutoTime() {
@@ -206,12 +211,16 @@ class Valve
 			} else {
 				$left = $left->format(self::DURATIONFORMAT); 
 			}
-			echo "<div class={$ClassType}_opened>$OpType open, $left time left<br>started at $s[Start]</div>"; 
+			echo "<div class={$ClassType}_opened>$OpType open, $left time left<br>Started at $s[Start]</div>"; 
 		} else {
 			if ($s["Manual"] || $s["Auto"]) {
 				$duration = $this->OpenDuration()->format(self::DURATIONFORMAT);
-				$TimeToOpen = $this->TimeToOpen()->format(self::DURATIONLONGFORMAT);
-				$WillOpen = "<br>$OpType open in $TimeToOpen for $duration";
+				if ($this->ShouldOpen()) {
+					$TimeToOpen = 'ASAP';
+				} else {
+					$TimeToOpen = 'in ' . $this->TimeToOpen()->format(self::DURATIONLONGFORMAT);
+				}
+				$WillOpen = "<br>$OpType open $TimeToOpen for $duration";
 			} else {
 				$WillOpen = "";
 			}
@@ -229,6 +238,7 @@ class Valve
 	
 	function GenerateParamsForm() {
 		?>
+		<form action="" method="post" name="ValveConfig">
 		<table class=center style="margin-top:10px; margin-bottom:0px"><tr>
 			<td class=valve_image style=width:72px><img src="<?=$this->params['General']['Image']?>"/></td>
 			<td style="vertical-align:middle; padding:0 10px 0 10px"><h1><?=$this->params['General']['Name']?></h1></td>
@@ -242,7 +252,7 @@ class Valve
 				<input type="submit" name="<?=$Op?>" value="<?=$Op?>" class=manual_<?=$Class?> style="height:64px;font-size:20px; padding:0 10px 0 10px;">
 		</tr></table>
 			</td>
-		<form action="" method="post" name="ValveConfig"><table class=center style="table-layout:fixed; padding:10px">
+		<table class=center style="table-layout:fixed; padding:10px">
 		<colgroup><col style="width:20px"><col style="width:200px"></colgroup>
 		<tr><td colspan=3><div style="margin:5px 0 5px 0px; border-top: 1px solid #eee;"></div></td></tr>
 		<tr><td colspan=2><div style="padding:0 0 0 10px">Use automatic scheduling?</div></td>
@@ -297,7 +307,8 @@ class Valve
 		$this->params["Auto"]["Interval"] = "P{$_POST["AutoInterval"]}D";
 		list($h, $m) = sscanf($_POST["ManualDuration"], "%d:%d");
 		$this->params["Manual"]["Duration"] = "PT{$h}H{$m}M";
-		$this->params["Manual"]["At"] = $_POST["ManualAtDate"] . ' ' . $_POST["ManualAtTime"];
+		list($h, $m) = sscanf($_POST["ManualAtTime"], "%d:%d");
+		$this->params["Manual"]["At"] = $_POST["ManualAtDate"] .  " {$h}:{$m}:00";
 		$this->WriteINI();
 	}
 	
@@ -307,18 +318,4 @@ class Valve
 		$this->params['Manual']['Duration'] = 'PT1H0M';
 		$this->WriteINI();
 	}
-}
-
-function UpdateValves() {
-	foreach(GetValvesList() as $valve){
-		if ($valve->IsOpen()) {
-			if ($valve->ShouldClose()) $valve->DoClose();
-		} else { 
-			if ($valve->ShouldOpen()) $valve->DoOpen();
-		}
-		$state[] = $valve->IsOpen();
-		$valve->WriteINI();
-	}
-	print_r($state);
-	// Update valves with state vector.
 }
