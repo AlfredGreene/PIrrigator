@@ -38,31 +38,36 @@
 			$Valve = GetValvesList()[$_GET["Valve"]];
 			$Valve->GenerateParamsForm();
 			$menu = false;
-		} else { ?>
-			<nav class="vertical menu">
-				<ul>
-					<?php foreach(GetValvesList() as $key=>$valve){?>
-						<li><a href="index.html?Valve=<?=$key?>"><?php $valve->GenerateMainMenuItem() ?></a></li>
-					<?php }?>
-					<li><a href="basic_markup.html">Basic Markup</a></li>
-					<li><a href="contact.html">Contact</a></li>
-				</ul>
-			</nav> 
-			<small class="copy">Current time and date: <?=(new DateTime())->format(Valve::DATEFORMAT)?></small>
-		<?php } ?>
+		} else {
+			echo '<nav class="vertical menu"><ul>';
+			$Valves = GetValvesList();
+			if (!empty($Valves)) {
+				foreach ($Valves as $Key=>$Valve) {
+					echo "<li><a href=\"index.html?Valve=$Key\">";
+					$Valve->GenerateMainMenuItem();
+					echo "</a></li>";
+				}
+			}
+			echo '</ul></nav>';
+		} ?>
     </div>
     <footer>
         <p class="copy">
 		&copy; 2013 pi.micronen.mooo.com | All right reserved <br/>
 		Design By Ronen Michaeli micronen@gmail.com <br/>
-		Based on template by <a href="http://www.mobifreaks.com" title="Mobifreaks.com">Mobifreaks.com</a><br/></p>
-		<div>
-		GET:<br><?php print_r($_GET) ?><br>
-		POST:<br><?php print_r($_POST) ?><br>
-		<?php if (isset($Valve)) { ?> Valve:<br><?php print_r($Valve) ?><br><?php } ?>
-		SERVER:<br><?php print_r($_SERVER) ?><br>
-		</div>
+		Based on template by <a href="http://www.mobifreaks.com" title="Mobifreaks.com">Mobifreaks.com</a></p>
+        <p class="copy">Current time and date: <?=(new DateTime())->format(Valve::DATEFORMAT)?></p>
 	</footer>
+
+	<div class="debug">
+        <p class="copy">Debug information:</p>
+		<?php 
+		if (isset($_GET)) { echo '<pre>GET: '; print_r($_GET); echo '</pre>'; }
+		if (isset($_POST)) { echo '<pre>POST: '; print_r($_POST); echo '</pre>'; }
+		if (isset($Valve)) { echo '<pre>Valve: '; print_r($Valve); echo '</pre>'; }
+		if (isset($_SERVER)) { echo '<pre>Server: '; print_r($_SERVER); echo '</pre>'; }
+		?>
+	</div>
 </body>
 </html>
 	

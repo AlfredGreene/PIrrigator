@@ -3,8 +3,8 @@ include_once 'ini_write.php';
 include_once 'mutex.php';
 include_once 'ValveHW.php';
 
-function GetValvesList() {
-	$files = glob('/var/www-data/valves/*.ini');
+function GetValvesList($path = '/var/www-data/valves/') {
+	$files = glob($path . '*.ini');
 	foreach($files as $file) {	
 		$valves[] = new Valve($file);
 	}
@@ -75,23 +75,21 @@ class Valve
 	
 	function DoOpen() {
 		if (!$this->IsOpen() && $this->CanOpen()) {
-			echo 'Opening ' . $this->params['General']['Name'] . "\n";
-			$this->HW->Open($this->params["General"]["HWID"]);
 			$this->params['Status']['Start'] = (new DateTime())->format(self::DATEFORMAT);
 			$this->WriteINI();
+			$this->HW->Open($this->params["General"]["HWID"]);
 		}
 	}
 
 	function DoClose() {
 		if ($this->IsOpen()) {
-			echo 'Closeing ' . $this->params['General']['Name'] . "\n";
-			$this->HW->Close($this->params["General"]["HWID"]);
 			$start = DateTime::createFromFormat(self::DATEFORMAT, $this->params["Status"]["Start"]);
 			$duration = $start->diff(new DateTime());
 			$this->params['History']['Dates'][] = $this->params['Status']['Start'];
 			$this->params['History']['Durations'][] = $duration->format(self::DURATIONLONGFORMAT);			
 			$this->params['Status']['Manual'] = false;
 			$this->WriteINI();
+			$this->HW->Close($this->params["General"]["HWID"]);
 		}
 	}
 

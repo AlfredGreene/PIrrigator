@@ -14,12 +14,10 @@ function ini_write($ini, $path, $has_sections=false) {
     if (!$handle = fopen($path, 'w')) { 
         return false; 
     } 
-    if (!fwrite($handle, $content)) { 
-		fclose($handle); 
-        return false; 
-    } 
-    fclose($handle); 
-    return true; 
+
+	$res = fwrite($handle, $content); 
+	fclose($handle); 
+	return $res; 
 }
 
 function format_ini_section($section) { 

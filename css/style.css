@@ -226,11 +226,22 @@ footer{
 	color:#4d4d4d;
 }
 footer p{	
-	font-size:12px;
+	font-size:smaller;
+	margin:0;
+}
+.debug{
+	border-top:2px solid #eee;
+	background:lightgray;
+	color:black;
+	font-size:smaller;
+}
+.debug pre{	
+	padding:10px;
 	margin:0;
 }
 .copy{
 	padding:10px;
+	margin:0;
 }
 .copy a{
 	color:#c52525;
