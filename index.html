@@ -37,7 +37,7 @@
 		<?php if (isset($_GET["Valve"])) {
 			$Valve = GetValvesList()[$_GET["Valve"]];
 			$Valve->GenerateParamsForm();
-			$menu = false;
+			$Valve->GenerateHistoryTable();
 		} else {
 			echo '<nav class="vertical menu"><ul>';
 			$Valves = GetValvesList();

@@ -248,8 +248,8 @@ class Valve
 				}
 				?>
 				<input type="submit" name="<?=$Op?>" value="<?=$Op?>" class=manual_<?=$Class?> style="height:64px;font-size:20px; padding:0 10px 0 10px;">
-		</tr></table>
 			</td>
+		</tr></table>
 		<table class=center style="table-layout:fixed; padding:10px">
 		<colgroup><col style="width:20px"><col style="width:200px"></colgroup>
 		<tr><td colspan=3><div style="margin:5px 0 5px 0px; border-top: 1px solid #eee;"></div></td></tr>
@@ -293,6 +293,17 @@ class Valve
 		</table>
 		</form>
 		<?php
+	}
+	
+	function GenerateHistoryTable() {
+		?>
+			<table>
+			<tr><th>#</th><th>Date</th><th>Duration</th></tr>
+		<?php
+		foreach ($this->params['History']['Dates'] as $Key=>$Date) {
+			$Duration = $this->params['History']['Durations'][$Key];
+			echo "<tr><td>$Key</td><td>$Date</td><td>$Duration</td></tr>";
+		}
 	}
 
 	function UpdateParamsFromForm() {
