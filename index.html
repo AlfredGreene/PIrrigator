@@ -1,20 +1,3 @@
-<?php 
-	include_once 'valve.php';
-	if (isset($_GET["Valve"]) && !empty($_POST)) {
-		$Valve = GetValvesList()[$_GET["Valve"]];
-		if (isset($_POST["Open"])) {
-			$Valve->ManualOpenNow();
-		} elseif (isset($_POST["Close"])) {
-			$Valve->DoClose();
-		} elseif (isset($_POST["Save"])) {
-			$Valve->UpdateParamsFromForm();
-		}
-		// Only POST once:
-		sleep(2);
-		header("Location: http://$_SERVER[HTTP_HOST]/index.html"); // Redirect browser
-		exit;      // Make sure that code below does not get executed when we redirect
-	}
-?>
 <!DOCTYPE html>
 <html>
 <head>
@@ -30,17 +13,34 @@
         <div class="logo">
 			<h1>Michaeli's PI Irrigation system</h1>
             <a href="index.html"><img src="http://lorempixel.com/300/80/nature" alt="PI Irrigation Logo" /></a>
-			<?php new ValveHW() ?>
 		</div>
     </header>    
-    <div class="content">
-		<?php if (isset($_GET["Valve"])) {
-			$Valve = GetValvesList()[$_GET["Valve"]];
-			$Valve->GenerateParamsForm();
-			$Valve->GenerateHistoryTable();
+    <div class="content"><?php 
+		include_once 'ValveDisplay.php';
+		$Valves = GetValvesDisplayList();
+		if (isset($_GET["Valve"]))
+			if (empty($_POST)) {
+				// Valve params form:
+				$Valve = $Valves[$_GET["Valve"]];
+				$Valve->GenerateParamsForm();
+				$Valve->GenerateHistoryTable();
+			} else {
+				// Valve form commands:
+				$Valve = $Valves[$_GET["Valve"]];
+				if (isset($_POST["Open"])) {
+					$Valve->ManualOpenNow();
+				} elseif (isset($_POST["Close"])) {
+					$Valve->DoClose();
+				} elseif (isset($_POST["Save"])) {
+					$Valve->UpdateParamsFromForm();
+				}
+				// Only POST once:
+				sleep(2);
+				header("Location: http://$_SERVER[HTTP_HOST]/index.html"); // Redirect browser
+				exit;      // Make sure that code below does not get executed when we redirect
 		} else {
+			// Main valves menu
 			echo '<nav class="vertical menu"><ul>';
-			$Valves = GetValvesList();
 			if (!empty($Valves)) {
 				foreach ($Valves as $Key=>$Valve) {
 					echo "<li><a href=\"index.html?Valve=$Key\">";
@@ -49,8 +49,8 @@
 				}
 			}
 			echo '</ul></nav>';
-		} ?>
-    </div>
+		} 
+	?> </div>
     <footer>
         <p class="copy">
 		&copy; 2013 pi.micronen.mooo.com | All right reserved <br/>
