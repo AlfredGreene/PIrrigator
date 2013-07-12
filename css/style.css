@@ -220,9 +220,21 @@ header{
     margin-left: auto;
     margin-right: auto;
 }
+.content{
+	border-top:1px solid #eee;
+	background:#EDF6FA;
+	color:black;
+}
+.history{
+	padding-top:10px;
+	padding-bottom:10px;
+	border-top:1px solid #eee;
+	background:#E9F1F5;
+	color:black;
+}
 footer{
 	border-top:1px solid #eee;
-	background:#e3f2f9;
+	background:#D4EEFA;
 	color:#4d4d4d;
 }
 footer p{	
@@ -325,4 +337,32 @@ header .menu a{
 	width:95%;
 	padding:0 10px 0 10px;
 	margin:0;
+}
+
+/* History table */
+#history
+{
+	border-collapse:collapse;
+	margin-left:auto;
+	margin-right:auto;
+	background-color:white;	
+}
+#history td, #history th 
+{
+	border:1px solid #eee;
+	padding:3px 7px 3px 7px;
+}
+#history th 
+{
+	font-size:18px;
+	text-align:center;
+	padding-top:5px;
+	padding-bottom:5px;
+	background-color:cyan;	
+	color:#ffffff;
+}
+#history tr.alt td 
+{
+	color:#000000;
+	background-color:lightgray;
 }

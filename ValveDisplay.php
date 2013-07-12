@@ -123,7 +123,7 @@ class ValveDisplay extends Valve
 			<td>Open for</td>
 			<td><input type="time" name="ManualDuration" value="<?=$this->FormatManualDuration()?>"></td></tr>
 		<tr><td colspan=3><div style="margin:5px 0 5px 0px; border-top: 1px solid #eee;"></div></td></tr>
-		<tr><td colspan=3><div class=center style="width:40%;margin-top:10px">
+		<tr><td colspan=3><div class=center style="width:40%; margin-top:0px; margin-bottom:10px">
 			<input type="submit" name="Save" value="Save" class="status" style="width:100%;height:30px;font-size:16px">
 			</div></td></tr>
 		</table>
@@ -133,13 +133,22 @@ class ValveDisplay extends Valve
 	
 	function GenerateHistoryTable() {
 		?>
-			<table>
+			<div class=history><table id=history>
 			<tr><th>#</th><th>Date</th><th>Duration</th></tr>
 		<?php
+//			<colgroup><col style="width:5em"><col style="width:5em"><col style="width:5em"></colgroup>
+		$alt = false;
 		foreach ($this->params['History']['Dates'] as $Key=>$Date) {
+			if ($alt) {
+				echo "<tr class=alt>";
+			} else {
+				echo "<tr>";
+			}
+			$alt = !$alt;
 			$Duration = $this->params['History']['Durations'][$Key];
-			echo "<tr><td>$Key</td><td>$Date</td><td>$Duration</td></tr>";
+			echo "<td>$Key</td><td>$Date</td><td>$Duration</td></tr>";
 		}
+		echo '</table></div>';
 	}
 
 	function UpdateParamsFromForm() {
