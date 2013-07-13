@@ -342,7 +342,6 @@ header .menu a{
 /* History table */
 #history
 {
-	border-collapse:collapse;
 	margin-left:auto;
 	margin-right:auto;
 	background-color:white;	
@@ -365,4 +364,18 @@ header .menu a{
 {
 	color:#000000;
 	background-color:lightgray;
+}
+
+/* Form Header table */
+#form-header
+{
+	margin-left:auto;
+	margin-right:auto;
+	margin-top:10px;
+	margin-bottom:0px;
+}
+#form-header td, #form-header th 
+{
+	vertical-align:middle;
+	padding:0 10px 0 10px;
 }
