@@ -20,15 +20,24 @@ class ValveDisplay extends Valve
 		echo '<table style="width:100%; table-layout:fixed"><tr>';
 		echo "<td class=valve_image style=width:72px><img src=\"$g[Image]\"/></td>";
 		echo '<td class=valve_text>';
-		echo "<h2>$g[Name]</h2>";
+		echo "<div style='line-height:24px;font-size: 18px;margin:0 0 .3em 0;font-weight:bold;'>$g[Name]</div>";
 		
+		echo '<div style="line-height:24px;font-size: 12px;margin:0 0 .6em 0;font-weight:bold;">';
 		if ($s["Auto"]) {
 			$interval = (new DateInterval($a['Interval']))->format("%d days");
 			$duration = (new DateInterval($a['Duration']))->format("%H:%M");
-			echo "<h5>Opens for $duration at $a[At] every $interval</h5>";
-		} else {
-			echo '<h5 style="color:red">Scheduled opetation is disabled</h5>';		
+			echo "Opens for $duration at $a[At] every $interval";
 		}
+		if ($s["Auto"] && $s["Manual"]) echo '<br>';
+		if ($s["Manual"]) {
+			$duration = (new DateInterval($m['Duration']))->format("%H:%M");
+			echo "Manual open for $duration at $m[At]";
+		}
+
+		if (!$s["Auto"] && !$s["Manual"]) {
+			echo '<span style="backgound:red">Scheduled opetation is disabled</span>';		
+		}
+		echo '</div>';
 		
 		if ($s["Manual"]) {
 			$OpType = 'Manual';
@@ -75,83 +84,77 @@ class ValveDisplay extends Valve
 	}
 	
 	function GenerateParamsForm() {
+		echo '<form action="" method="post" name="ValveConfig">';
+		foreach ($_POST as $Key=>$Value) {
+			echo "<input type=\"hidden\" name=\"$Key\" value=\"$Value\">";
+		}
 		?>
-		<form action="" method="post" name="ValveConfig">
-		
 		<table id="form-header"><tr>
 			<td style="border-right:2px solid #e3f2f9"><img src="<?=$this->params['General']['Image']?>"/></td>
 			<td><h1><?=$this->params['General']['Name']?></h1></td>
 			<td style="border-left:2px solid #e3f2f9">
-				<?php if ($this->IsOpen()) {
-					$Op = 'Close'; $Class = 'closed';
-				} else {
-					$Op = 'Open'; $Class = 'opened';
-				}
-				?>
+				<?php if ($this->IsOpen()) { $Op = 'Close'; $Class = 'closed'; } else { $Op = 'Open'; $Class = 'opened'; } ?>
 				<input type="submit" name="<?=$Op?>" value="<?=$Op?>" class=manual_<?=$Class?> style="height:64px;font-size:20px; padding:0 10px 0 10px;">
 			</td>
 		</tr></table>
 		
 		<table class=center style="table-layout:fixed; padding:10px">
-		<colgroup><col style="width:20px"><col style="width:200px"></colgroup>
-		<?php
-		$this->AddSelectHeaderLine('Use automatic scheduling?', 'Auto', $this->YesNoArray, $this->params['Status']['Auto']);	
-		$this->AddFormTimeLine('Open at', 'AutoAt', $this->FormatAutoTime()); 
-		$this->AddSelectLine('Days in between', 'AutoInterval', $this->DurationArray, $this->params['Auto']['Interval']);
-		$this->AddFormTimeLine('Open for', 'AutoDuration', $this->FormatAutoDuration());
+			<colgroup><col style="width:20px"><col style="width:200px"></colgroup>
+			<?php
+			$this->AddSelectHeaderLine('Use automatic scheduling?', 'Auto', $this->YesNoArray, $this->params['Status']['Auto']);	
+			$this->AddFormTimeLine('Open at', 'AutoAt', $this->FormatAutoTime()); 
+			$this->AddSelectLine('Days in between', 'AutoInterval', $this->DurationArray, $this->params['Auto']['Interval']);
+			$this->AddFormTimeLine('Open for', 'AutoDuration', $this->FormatAutoDuration());
 
-		$this->AddSelectHeaderLine('Use manual scheduling?', 'Manual', $this->YesNoArray, $this->params['Status']['Manual']);	
-		$this->AddFormDateTimeLine('Open at', 'ManualAtDate', $this->FormatManualDate(), 'ManualAtTime', $this->FormatManualTime());
-		$this->AddFormTimeLine('Open for', 'ManualDuration', $this->FormatManualDuration()); 
+			$this->AddSelectHeaderLine('Use manual scheduling?', 'Manual', $this->YesNoArray, $this->params['Status']['Manual']);	
+			$this->AddFormDateTimeLine('Open at', 'ManualAtDate', $this->FormatManualDate(), 'ManualAtTime', $this->FormatManualTime());
+			$this->AddFormTimeLine('Open for', 'ManualDuration', $this->FormatManualDuration()); 
 
-		$this->AddSeperatorLine();
-		?>
-		<tr><td colspan=3><div style="width:40%; margin:0px auto 10px auto">
-			<input type="submit" name="Save" value="Save" class="status" style="width:100%;height:30px;font-size:16px">
-			</div></td></tr>
+		 	$this->AddSeperatorLine();
+			?>
+			<tr><td colspan=3><div style="width:40%; margin:0px auto 10px auto">
+				<input type="submit" name="Save" value="Save" class="status" style="width:100%;height:30px;font-size:16px">
+				</div></td></tr>
 		</table>
 		</form>
 		<?php
 	}
 
-	function AddFormDateLine($Text, $NameDate, $ValueDate) {
-		$this->AddFormDateTimeLine($Text, $NameDate, $ValueDate, null, null);
+	public static function AddFormDateLine($Text, $NameDate, $ValueDate) {
+		self::AddFormDateTimeLine($Text, $NameDate, $ValueDate, null, null);
 	}
 
-	function AddFormTimeLine($Text, $NameTime, $ValueTime) {
-		$this->AddFormDateTimeLine($Text, null, null, $NameTime, $ValueTime);
+	public static function AddFormTimeLine($Text, $NameTime, $ValueTime) {
+		self::AddFormDateTimeLine($Text, null, null, $NameTime, $ValueTime);
 	}
 	
-	function AddFormDateTimeLine($Text, $NameDate, $ValueDate, $NameTime, $ValueTime) {
+	public static function AddFormDateTimeLine($Text, $NameDate, $ValueDate, $NameTime, $ValueTime) {
 		echo "<tr><td></td><td>$Text</td><td>";
 		if (!empty($NameDate)) echo "<input type=\"date\" name=\"$NameDate\" value=\"$ValueDate\">";
 		if (!empty($NameTime)) echo "<input type=\"time\" name=\"$NameTime\" value=\"$ValueTime\">";
 		echo "</td></tr>";
 	}
 	
-	function AddSelectLine($Text, $Name, $Array, $Value) {
+	public static function AddSelectLine($Text, $Name, $Array, $Value) {
 		echo "<tr><td></td><td>$Text</td><td><select name=\"$Name\">";
-		$this->SelectArray($Array, $Value); 
+		self::SelectArray($Array, $Value); 
 		echo "</select></td></tr>";
 	}
 
 	function AddSelectHeaderLine($Text, $Name, $Array, $Value) {		
-		$this->AddSeperatorLine();
+		self::AddSeperatorLine();
 		echo '<tr><td colspan=2><div style="padding:0 0 0 10px">' . $Text . '</div></td><td><select name="' . $Name . '">';
-		$this->SelectArray($this->YesNoArray, $this->params['Status']['Auto']);
+		$this->SelectArray($Array, $Value);
 		echo '</select></td></tr>';
 	}
 
-	function AddSeperatorLine() {		
+	public static function AddSeperatorLine() {		
 		echo '<tr><td colspan=3><div style="margin:5px 0 5px 0px; border-top: 1px solid #eee;"></div></td></tr>';
 	}
 	
-	function SelectArray($Arr, $Val) { 
-		foreach($Arr as $Key=>$Value) {
-			echo "<option value=\"$Key\"";
-			if ($Key==$Val) echo ' selected';
-			echo ">$Value</option>";
-		}
+	public static function SelectArray($Array, $Selected) { 
+		foreach($Array as $Key=>$Value)
+			echo "<option value=\"$Key\"" . (($Key==$Selected) ? ' selected' : '') . ">$Value</option>";
 	}
 	
 	function GenerateHistoryTable() {
@@ -177,7 +180,7 @@ class ValveDisplay extends Valve
 		list($h, $m) = sscanf($_POST["ManualDuration"], "%d:%d");
 		$this->params["Manual"]["Duration"] = "PT{$h}H{$m}M";
 		list($h, $m) = sscanf($_POST["ManualAtTime"], "%d:%d");
-		$this->params["Manual"]["At"] = $_POST["ManualAtDate"] .  " {$h}:{$m}:00";
+		$this->params["Manual"]["At"] = $_POST["ManualAtDate"] .  sprintf(' %02d:%02d:00', $h, $m);
 		$this->WriteINI();
 	}
 }

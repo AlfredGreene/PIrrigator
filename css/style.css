@@ -40,6 +40,17 @@ article img{
 }
 a{ color:#38A4D8;}
 a:hover{ color:#2489b9;}
+
+.menubutton{ 
+	background:#f9f9f9;
+	color:#38A4D8;
+	border:0;
+	text-align:left;
+}
+.menubutton:hover{ 
+	color:#2489b9;
+}
+
 /* headings */
 h1, h2, h3, h4, h5, h6{
 	font-weight:bold;
@@ -278,9 +289,6 @@ header .menu{
 header .menu a{
 	padding:15px 15px 15px 25px;
 }
-/*header .menu li:last-child a{
-	border-bottom:none;
-}*/
 
 /* status*/
 .status, .auto_closed, .auto_opened, .manual_closed, .manual_opened, .disabled_closed, .disabled_opened{

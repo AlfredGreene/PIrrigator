@@ -18,37 +18,46 @@
     <div class="content"><?php 
 		include_once 'ValveDisplay.php';
 		$Valves = GetValvesDisplayList();
-		if (isset($_GET["Valve"]))
-			if (empty($_POST)) {
+		if (isset($_POST["Valve"])) {
+			// Valve form commands:
+			$Valve = $Valves[$_POST["Valve"]];
+			$Redirect = true;
+			if (isset($_POST["Open"])) {
+				$Valve->ManualOpenNow();
+			} elseif (isset($_POST["Close"])) {
+				$Valve->DoClose();
+			} elseif (isset($_POST["Save"])) {
+				$Valve->UpdateParamsFromForm();
+			} else {
 				// Valve params form:
-				$Valve = $Valves[$_GET["Valve"]];
+				$Redirect = false;
 				$Valve->GenerateParamsForm();
 				$Valve->GenerateHistoryTable();
-			} else {
-				// Valve form commands:
-				$Valve = $Valves[$_GET["Valve"]];
-				if (isset($_POST["Open"])) {
-					$Valve->ManualOpenNow();
-				} elseif (isset($_POST["Close"])) {
-					$Valve->DoClose();
-				} elseif (isset($_POST["Save"])) {
-					$Valve->UpdateParamsFromForm();
-				}
+			}
+			if ($Redirect) { 
 				// Only POST once:
-				sleep(2);
 				header("Location: http://$_SERVER[HTTP_HOST]/index.html"); // Redirect browser
 				exit;      // Make sure that code below does not get executed when we redirect
+			}
 		} else {
 			// Main valves menu
-			echo '<nav class="vertical menu"><ul>';
+			echo '<form action="" method="post">';
+			echo '<table style="width:100%; table-layout:fixed">';
 			if (!empty($Valves)) {
 				foreach ($Valves as $Key=>$Valve) {
-					echo "<li><a href=\"index.html?Valve=$Key\">";
+					echo "<tr><td><button type=submit name=Valve value=\"$Key\" class=menubutton>";
 					$Valve->GenerateMainMenuItem();
-					echo "</a></li>";
+					echo "</button></td></tr>";
 				}
 			}
-			echo '</ul></nav>';
+			echo '</table>';
+			
+			echo '<table style="width:100%">';
+			echo '<tr><td><h3>Default Action: </h3></td><td><select name="DefaultAction">';
+			ValveDisplay::SelectArray(['Toggle'=>'Toggle Mode', 'Properties'=>'Properties'],
+				isset($_POST['DefaultAction']) ? $_POST['DefaultAction'] : 'Toggle'); 
+			echo '</select></td></tr>';
+			echo '</table></form>';
 		} 
 	?> </div>
     <footer>
