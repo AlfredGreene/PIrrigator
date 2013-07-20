@@ -175,8 +175,12 @@ class Valve
 
 function GetValvesList($path = Valve::DEFAULTPATH) {
 	$files = glob($path . '*.ini');
-	foreach($files as $file) {	
-		$valves[] = new Valve($file);
+	if (empty($files)) {
+		return null;
+	} else { 
+		foreach($files as $file) {	
+			$valves[] = new Valve($file);
+		}
+		return $valves;
 	}
-	return $valves;
 }

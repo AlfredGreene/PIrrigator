@@ -42,15 +42,17 @@
 		} else {
 			// Main valves menu
 			echo '<form action="" method="post">';
-			echo '<table style="width:100%; table-layout:fixed">';
 			if (!empty($Valves)) {
+				echo '<table style="width:100%; table-layout:fixed">';
 				foreach ($Valves as $Key=>$Valve) {
 					echo "<tr><td><button type=submit name=Valve value=\"$Key\" class=menubutton>";
 					$Valve->GenerateMainMenuItem();
 					echo "</button></td></tr>";
 				}
+				echo '</table>';
+			} else {
+				echo '<h2 class=txt-center>No valves INI files found, read the Readme file...</h2>';
 			}
-			echo '</table>';
 			
 /*			echo '<table style="width:100%">';
 			echo '<tr><td><h3>Default Action: </h3></td><td><select name="DefaultAction">';

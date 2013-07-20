@@ -187,8 +187,12 @@ class ValveDisplay extends Valve
 
 function GetValvesDisplayList($path = ValveDisplay::DEFAULTPATH) {
 	$files = glob($path . '*.ini');
-	foreach($files as $file) {	
-		$valves[] = new ValveDisplay($file);
+	if (empty($files)) {
+		return null;
+	} else { 
+		foreach($files as $file) {	
+			$valves[] = new ValveDisplay($file);
+		}
+		return $valves;
 	}
-	return $valves;
 }
