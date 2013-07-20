@@ -52,22 +52,23 @@
 			}
 			echo '</table>';
 			
-			echo '<table style="width:100%">';
+/*			echo '<table style="width:100%">';
 			echo '<tr><td><h3>Default Action: </h3></td><td><select name="DefaultAction">';
 			ValveDisplay::SelectArray(['Toggle'=>'Toggle Mode', 'Properties'=>'Properties'],
 				isset($_POST['DefaultAction']) ? $_POST['DefaultAction'] : 'Toggle'); 
 			echo '</select></td></tr>';
-			echo '</table></form>';
+			echo '</table></form>';*/
 		} 
 	?> </div>
     <footer>
         <p class="copy">
-		&copy; 2013 pi.micronen.mooo.com | All right reserved <br/>
-		Design By Ronen Michaeli micronen@gmail.com <br/>
-		Based on template by <a href="http://www.mobifreaks.com" title="Mobifreaks.com">Mobifreaks.com</a></p>
+		&copy; 2013 pi.micronen.mooo.com | All right reserved<br/>
+		Design By Ronen Michaeli micronen@gmail.com<br/>
+		Based on template by <a href="http://www.mobifreaks.com" title="Mobifreaks.com">Mobifreaks.com</a><br/>
+		Images courtesy of <a href="http://lorempixel.com" title="lorempixel.com">lorempixel.com</a></p>
         <p class="copy">Current time and date: <?=(new DateTime())->format(Valve::DATEFORMAT)?></p>
 	</footer>
-
+<!--
 	<div class="debug">
         <p class="copy">Debug information:</p>
 		<?php 
@@ -77,6 +78,7 @@
 		if (isset($_SERVER)) { echo '<pre>Server: '; print_r($_SERVER); echo '</pre>'; }
 		?>
 	</div>
+//-->
 </body>
 </html>
 	
