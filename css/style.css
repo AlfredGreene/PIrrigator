@@ -1,4 +1,5 @@
-html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,dl,dt,dd,ol,nav ul,nav li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td,article,aside,canvas,details,embed,figure,figcaption,footer,header,hgroup,menu,nav,output,ruby,section,summary,time,mark,audio,video{margin:0;padding:0;border:0;font-size:100%;font:inherit;vertical-align:baseline;}
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,dl,dt,dd,ol,nav ul,nav li,fieldset,form,label,legend,caption,article,aside,canvas,details,embed,figure,figcaption,footer,header,hgroup,menu,nav,output,ruby,section,summary,time,mark,audio,video{margin:0;padding:0;border:0;font-size:100%;font:inherit;vertical-align:baseline;}
+/* ,table,tbody,tfoot,thead,tr,th,td */
 article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section {display: block;}
 ol,ul{list-style:none;}
 blockquote,q{quotes:none;}
@@ -46,6 +47,7 @@ a:hover{ color:#2489b9;}
 	color:#38A4D8;
 	border:0;
 	text-align:left;
+	width:100%;
 }
 .menubutton:hover{ 
 	color:#2489b9;
@@ -217,7 +219,7 @@ form input[type=submit]{
 	cursor: pointer;	
 }
 /* -- header -- */
-header{
+.header{
 	border-bottom:1px solid #eee;
 	background:#78c0e4;
 }
@@ -243,12 +245,12 @@ header{
 	background:#E9F1F5;
 	color:black;
 }
-footer{
+.footer{
 	border-top:1px solid #eee;
 	background:#D4EEFA;
 	color:#4d4d4d;
 }
-footer p{	
+.footer p{	
 	font-size:smaller;
 	margin:0;
 }
@@ -283,10 +285,10 @@ footer p{
 .menu a:hover{
 	background:#fff;
 }
-header .menu{
+.header menu{
 	border-top:1px solid #eee;
 }
-header .menu a{
+.header menu a{
 	padding:15px 15px 15px 25px;
 }
 
@@ -331,7 +333,7 @@ header .menu a{
 /* valve image */
 .valve_image img{
 	float:left;
-	width:64px;
+	width:85px;
 	height:64px;
 	padding:0 10px 0 0;
 	border-right:2px solid #e3f2f9;

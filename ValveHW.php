@@ -13,6 +13,11 @@ class ValveHW
 			self::$i2c = new I2C(0x20, 1);
 		}
 	}
+
+	public function hw_exists() {
+		$mutex = new Mutex(self::mutex);
+		return self::$i2c->hw_exists();
+	}
 	
 	private function read() {
 		$mutex = new Mutex(self::mutex);
@@ -38,18 +43,22 @@ class ValveHW
 	}
 	
 	public function Close($valve) {
-		$this->write_bit($valve, false);
+		$this->write_bit($valve, true);
 	}
 
 	public function Open($valve) {
-		$this->write_bit($valve, true);
+		$this->write_bit($valve, false);
 	}
 	
 	public function IsOpen($valve) {
-		return $this->read_bit($valve) != 0;
+		return $this->read_bit($valve) == 0;
 	}
 
 	public function CanOpen($valve) {
-		return $this->read() == 0;
+		return $this->read() == 255;
+	}
+
+	public function CloseAll() {
+		return $this->write(255);
 	}
 }

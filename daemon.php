@@ -1,7 +1,8 @@
 #!/usr/bin/php
 <?php
 	include_once 'valve.php';
-	const LOG = '/var/www-data/valves/deamon.log';
+	include_once 'ValveHW.php';
+	const LOG = '/var/www-data/valves/daemon.log';
 
 	fclose(STDIN);
 	fclose(STDOUT);
@@ -11,7 +12,10 @@
 	$STDERR = fopen(LOG, 'a');
 
 	$now = (new DateTime())->format(Valve::DATEFORMAT);
-	echo $now . ': Starting deamon' . PHP_EOL;
+	echo $now . ': Starting daemon' . PHP_EOL;
+	
+	$HW = new ValveHW;
+	$HW->CloseAll();	// Close all values
 
 	while (true) { 
 		$Valves = GetValvesList();
@@ -32,6 +36,6 @@
 				}
 			}
 		}
-		sleep(60);
+		sleep(10);
 	}
 	

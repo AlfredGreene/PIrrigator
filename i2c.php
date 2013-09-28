@@ -9,7 +9,6 @@ class I2C
 	function __construct($addr, $bus = 1) {		
 		$this->addr = $bus . ' ' . $addr;
 		if (!$this->hw_exists()) {
-			echo '<h2 style="text-align: center">NO HW FOUND - Simulation mode</h2>' . PHP_EOL;
 			$this->hwsim = '/var/www-data/valves/i2c_hwsim' . $bus . '_' . $addr . '.txt';
 			$f = fopen($this->hwsim, 'r');
 			if ($f === false) {
@@ -21,13 +20,21 @@ class I2C
 	}
 
 	public function hw_exists() {
-		$ans = trim(shell_exec('/usr/sbin/i2cget -y ' . $this->addr . ' 2>&1'));
-		return strcmp($ans, 'Error: Read failed');
+		for ($i = 0; $i <= 10; $i++) {
+			$ans = trim(shell_exec('/usr/sbin/i2cget -y ' . $this->addr . ' 2>&1'));
+			if (strcmp($ans, 'Error: Read failed')) {
+				return TRUE;
+			}
+		}
+		return FALSE;
 	}
 	
 	public function read_register($register = '') {
 		if (is_null($this->hwsim)) {
-			return intval(trim(shell_exec('/usr/sbin/i2cget -y ' . $this->addr . ' ' . $register)));
+//			echo '/usr/sbin/i2cget -y ' . $this->addr . ' ' . $register . PHP_EOL;
+			$ans = shell_exec('/usr/sbin/i2cget -y ' . $this->addr . ' ' . $register);
+//			echo '|' . trim($ans) . '|' . PHP_EOL;
+			return intval(trim($ans), 16);
 		} else {
 			$f = fopen($this->hwsim, 'r');
 			$value = intval(fgets($f));
@@ -38,7 +45,18 @@ class I2C
 			
 	public function write_register($value, $register = '') {
 		if (is_null($this->hwsim)) {
-			shell_exec('/usr/sbin/i2cset -y ' . ' ' . $register . ' ' . $value );
+//			echo '/usr/sbin/i2cset -y ' . $this->addr . ' ' . $register . ' ' . $value . PHP_EOL;
+			for ($i = 0; $i <= 10; $i++) {
+				shell_exec('/usr/sbin/i2cset -y ' . $this->addr . ' ' . $register . ' ' . $value );
+				if ($this->read_register($register) == $value) {
+					break;
+				}
+			}
+			if ($i >= 10) {
+				error_log('Error writing value ' . $value . ' read: ' . $this->read_register($register) . PHP_EOL);
+			} elseif ($i > 0) {
+				error_log('Warning value ' . $value . ' was written after ' . $i . ' tries.' . PHP_EOL);
+			}
 		} else {
 			$f = fopen($this->hwsim, 'w');
 			fwrite($f, $value);

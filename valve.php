@@ -107,12 +107,20 @@ class Valve
 		return DateTime::createFromFormat(self::DURATIONDATEFORMAT, $this->params["Auto"]["At"])->format(self::DATETIMEFORMAT);
 	}
 
+	function FormatAutoInterval() {
+		return (new DateInterval($this->params["Auto"]['Interval']))->format("%d days");
+	}
+
 	function FormatAutoDuration() {
 		return (new DateInterval($this->params["Auto"]["Duration"]))->format(self::DURATIONFORMAT);
 	}
 	
 	function FormatManualDuration() {
 		return (new DateInterval($this->params["Manual"]["Duration"]))->format(self::DURATIONFORMAT);
+	}
+
+	function FormatManualAt() {
+		return DateTime::createFromFormat(self::DATEFORMAT, $this->params["Manual"]["At"])->format(self::DATEFORMAT);
 	}
 
 	function FormatManualDate() {
@@ -173,13 +181,13 @@ class Valve
 	}
 }
 
-function GetValvesList($path = Valve::DEFAULTPATH) {
+function GetValvesList($class_name = 'Valve', $path = Valve::DEFAULTPATH) {
 	$files = glob($path . '*.ini');
 	if (empty($files)) {
 		return null;
 	} else { 
 		foreach($files as $file) {	
-			$valves[] = new Valve($file);
+			$valves[] = new $class_name($file);
 		}
 		return $valves;
 	}
