@@ -1,5 +1,7 @@
 *.mutex
-valves/*
+# valves/*
+valves/*.log
+valves/*.txt
 
 #############
 ## Windows detritus
