@@ -182,7 +182,7 @@ class Valve
 }
 
 function GetValvesList($class_name = 'Valve', $path = Valve::DEFAULTPATH) {
-	$files = glob($path . '*.ini');
+	$files = glob($path . '*.vlv');
 	if (empty($files)) {
 		return null;
 	} else { 

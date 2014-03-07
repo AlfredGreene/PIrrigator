@@ -1,0 +1,18 @@
+[General]
+Name = "פוקסיה"
+Image = "images/P4020229_small.jpg"
+HWID = "5"
+[Auto]
+Duration = "PT1H0M"
+At = "4:30"
+Interval = "P3D"
+[Manual]
+Duration = "PT1H0M"
+At = "2014-03-07 13:56:00"
+[Status]
+Manual = "0"
+Auto = "0"
+Start = "2014-03-07 13:56:03"
+[History]
+Dates[] = "2014-03-07 13:56:03"
+Durations[] = "0 days 00:00"
