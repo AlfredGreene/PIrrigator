@@ -9,16 +9,38 @@
 			$Valve->GenerateMainMenuItem();
 			echo "</button></td></tr>";
 		}
-//		echo "<tr><td><p class='copy'>Current time and date: " . (new DateTime())->format(Valve::DATEFORMAT) . "</p></td></tr>";
 		echo '</table>';
+	}
+	
+	function GetFooter() {
+		?>
+		<div class="footer" id="Footer">
+			<p class="copy">
+			&copy; 2013 pi.micronen.mooo.com | All right reserved<br/>
+			Design By Ronen Michaeli micronen@gmail.com<br/>
+			Based on template by <a href="http://www.mobifreaks.com" title="Mobifreaks.com">Mobifreaks.com</a><br/>
+			<p class="copy">Current time and date: <?=(new DateTime())->format(Valve::DATEFORMAT)?></p>
+		</div>
+		<?php
 	}
 	
 	$Valves = GetValvesList('ValveDisplay');
 	if (isset($_REQUEST["MainMenu"])) {
 		GetMainMenu($Valves);
 		exit;
+	} elseif (isset($_REQUEST["Footer"])) {
+		GetFooter();
+		exit;
 	}
 ?>
+<script language="javascript">
+	window.setInterval("refresh()", 1000);
+	function refresh() { 
+		$('#MainMenu').load('index.html?MainMenu'); 
+		$('#Footer').load('index.html?Footer'); 
+	}
+</script>
+	
 <!DOCTYPE html>
 <html>
 <head>
@@ -69,12 +91,6 @@
 			echo '<form action="" method="post" name="MainValvesMenu">';
 			if (!empty($Valves)) {
 				GetMainMenu($Valves);
-				?>
-				<script language="javascript">
-					window.setInterval("refreshMainMenu()", 10000);
-					function refreshMainMenu() { $('#MainMenu').load('index.html?MainMenu'); }
-				</script>
-				<?php
 			} else {
 				echo '<h2 class=txt-center>No valves INI files found, read the Readme file...</h2>';
 			}
@@ -89,13 +105,10 @@
 			echo '</form>';
 		}
 	?> </div>
-    <div class="footer">
-        <p class="copy">
-		&copy; 2013 pi.micronen.mooo.com | All right reserved<br/>
-		Design By Ronen Michaeli micronen@gmail.com<br/>
-		Based on template by <a href="http://www.mobifreaks.com" title="Mobifreaks.com">Mobifreaks.com</a><br/>
-        <p class="copy">Current time and date: <?=(new DateTime())->format(Valve::DATEFORMAT)?></p>
-	</div>
+
+	<?php
+	GetFooter();
+	?>
 <!--
 	<div class="debug">
         <p class="copy">Debug information:</p>
