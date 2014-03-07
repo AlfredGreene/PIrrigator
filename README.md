@@ -3,7 +3,7 @@ PIrrigator
 
 An irrigation control system based on a Raspberry PI
 
-This application allowes controlling a set of valves connected via I2C to a Raspberry PI.
+This application allows controlling a set of valves connected via I2C to a Raspberry PI.
 
 It allows a private scheduling program for each valve,
 along with manual control via WEB interface optimized for mobile devices.
@@ -18,7 +18,52 @@ Hardware part includes:
 
 Installation instructions:
 1. Get a Raspberry PI and connect it to your local network.
-2. On the PI, install Apache & PHP.
+2. On the PI, install Apache, PHP, Samba, FTP, ...
+   Setup apache and PHP
+   sudo apt-get install apache2 apache2-doc apache2-utils
+   sudo apt-get install libapache2-mod-php5 php5 php-pear php5-xcache
+   a. nano /etc/apache2/apache2.conf
+     add to the end:
+ServerName localhost
+
+# Add PHP in HTML support
+AddHandler application/x-httpd-php .html
+   b. apachectl -k restart
+   
+   Add root SMB share:
+   sudo apt-get install samba samba-common-bin winbind smbclient
+   a. nano /etc/samba/smb.conf
+     uncomment line: "name resolve order = lmhosts host wins bcast"
+     uncomment line "security = user"
+	 in SHARES add: 
+[root]
+comment = Root share
+path = /
+valid users = @users
+force group = users
+create mask = 0660
+directory mask = 0771
+read only = no
+   b. usermod xbian -G users
+   c. smbpasswd -a xbian   
+   d. nano /etc/nsswitch.conf
+      add wins to end of hosts line
+   e. /etc/init.d/samba restart
+
+   Add root FTP share
+   sudo apt-get install vsftpd
+   a. nano /etc/vsftpd.conf
+anonymous_enable=NO
+local_enable=YES
+write_enable=YES
+	b. sudo /etc/init.d/vsftpd restart 
+	
+	Add Hebrew
+	a. Enable root user in xbian-config
+	b. su
+	c. sudo dpkg-reconfigure locales
+	d. select he_il UTF-8
+
 3. If you want to access it from the internet, register with a dns service.
    I use http://freedns.afraid.org/
 4. Create a directory called /var/www-data/valves and give the user www-data full access to it.
