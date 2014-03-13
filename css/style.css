@@ -53,6 +53,25 @@ a:hover{ color:#2489b9;}
 	color:#2489b9;
 }
 
+.menubutton2{
+	display:block;
+	padding:8px 5px;
+	background:#78c1e5;
+	color:#fff;
+	-webkit-border-radius:.3em;
+	   -moz-border-radius:.3em;
+			border-radius:.3em;
+/*	margin:0 10px 0 0;*/
+	width:100%;
+	font-size:18px;
+	font-weight:bold;
+	border:0;
+}
+.menubutton2:hover{ 
+	color:#2489b9;
+}
+
+
 /* headings */
 h1, h2, h3, h4, h5, h6{
 	font-weight:bold;
@@ -225,14 +244,17 @@ form input[type=submit]{
 }
 .logo{
 	padding:10px;
-	margin:0 auto;
+	margin:auto;
 }
 .logo a,
 .logo img{
 	display:block;
-    margin-left: auto;
-    margin-right: auto;
+    margin:auto;
+	-webkit-border-radius:.5em;
+	   -moz-border-radius:.5em;
+			border-radius:.5em;
 }
+
 .content{
 	border-top:1px solid #eee;
 	background:#EDF6FA;
@@ -292,8 +314,7 @@ form input[type=submit]{
 	padding:15px 15px 15px 25px;
 }
 
-/* status*/
-.status, .auto_closed, .auto_opened, .manual_closed, .manual_opened, .disabled_closed, .disabled_opened{
+.form_submit, .auto_closed, .auto_opened, .manual_closed, .manual_opened, .disabled_closed, .disabled_opened{
 	font-size:10px;
 	display:inline-block;
 	padding:3px 5px;
@@ -335,10 +356,13 @@ form input[type=submit]{
 	float:left;
 	width:85px;
 	height:64px;
-	padding:0 10px 0 0;
+/*	padding:0 10px 0 0;*/
 	border-right:2px solid #e3f2f9;
 	display:inline-block;
 	margin:0;
+	-webkit-border-radius:.3em;
+	   -moz-border-radius:.3em;
+			border-radius:.3em;
 }
 
 .valve_text{

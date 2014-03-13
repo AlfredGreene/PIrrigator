@@ -9,7 +9,13 @@
 			$Valve->GenerateMainMenuItem();
 			echo "</button></td></tr>";
 		}
-		echo '</table>';
+		?>		
+		<tr><td style='padding:5px'><input type="submit" class="menubutton2" style='margin:auto' name="GlobalAction" value="Enable automatic timers"</td></tr>
+		<tr><td style='padding:5px'><input type="submit" class="menubutton2" style='margin:auto' name="GlobalAction" value="Disable automatic timers"</td></tr>
+		<tr><td style='padding:5px'><input type="submit" class="menubutton2" style='margin:auto' name="GlobalAction" value="Open all valves"></td></tr>
+		<tr><td style='padding:5px'><input type="submit" class="menubutton2" style='margin:auto' name="GlobalAction" value="Close all valves"></td></tr>
+		</table>
+		<?php
 	}
 	
 	function GetFooter() {
@@ -86,6 +92,31 @@
 				header("Location: http://$_SERVER[HTTP_HOST]/index.html"); // Redirect browser
 				exit;      // Make sure that code below does not get executed when we redirect
 			}
+		} elseif (isset($_REQUEST["GlobalAction"])) {
+			foreach ($Valves as $Key=>$Valve) {
+				switch ($_REQUEST["GlobalAction"]) {
+					case "Disable automatic timers":
+						$Valve->params["Status"]["Auto"] = 0;
+						$Valve->WriteINI();
+						break;
+					case "Enable automatic timers":
+						$Valve->params["Status"]["Auto"] = 1;
+						$Valve->WriteINI();
+						break;
+					case "Close all valves":
+						$Valve->DoClose();
+						$Valve->params["Status"]["Manual"] = 0;
+						$Valve->WriteINI();
+						break;
+					case "Open all valves":
+						$Valve->ManualOpenNow();
+						break;
+					default:
+						echo 'Error in command' . PHP_EOL;
+				}
+			}			
+			header("Location: http://$_SERVER[HTTP_HOST]/index.html"); // Redirect browser
+			exit;      // Make sure that code below does not get executed when we redirect			
 		} else {
 			// Main valves menu
 			echo '<form action="" method="post" name="MainValvesMenu">';
@@ -95,18 +126,16 @@
 				echo '<h2 class=txt-center>No valves INI files found, read the Readme file...</h2>';
 			}
 
-/*			echo '<table style="width:100%">';
-			echo '<tr><td><h3>Default Action: </h3></td><td><select name="DefaultAction">';
-			ValveDisplay::SelectArray(['Toggle'=>'Toggle Mode', 'Properties'=>'Properties'],
-				isset($_REQUEST['DefaultAction']) ? $_REQUEST['DefaultAction'] : 'Toggle');
-			echo '</select></td></tr>';
-			echo '</table>';*/
+//			echo '<table style="width:100%">';
+//			echo '<tr><td><h3>Default Action: </h3></td><td><select name="DefaultAction">';
+//			ValveDisplay::SelectArray(['Toggle'=>'Toggle mode', 'Properties'=>'Properties'],
+//				isset($_REQUEST['DefaultAction']) ? $_REQUEST['DefaultAction'] : 'Toggle');
+//			echo '</select></td></tr>';
+//			echo '</table>';
 
 			echo '</form>';
 		}
-	?> </div>
-
-	<?php
+	echo '</div>';
 	GetFooter();
 	?>
 <!--

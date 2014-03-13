@@ -18,7 +18,7 @@ class ValveDisplay extends Valve
 		$m = $this->params["Manual"];
 
 		echo "<table style='width:99%'><tr>";
-		echo "<td rowspan=3 class=valve_image style=width:100px><img src=\"$g[Image]\"/></td>";
+		echo "<td rowspan=3 class=valve_image style=width:95><img src=\"$g[Image]\"/></td>";
 		echo "<td><span style='font-size:18px; font-weight:bold;'>$g[Name]</span></td></tr>";
 
 		echo "<tr><td><span style='font-size:12px; font-weight:bold;'>";
@@ -109,7 +109,7 @@ class ValveDisplay extends Valve
 		 	$this->AddSeperatorLine();
 			?>
 			<tr><td colspan=3><div style="width:40%; margin:0px auto 10px auto">
-				<input type="submit" name="Save" value="Save" class="status" style="width:100%;height:30px;font-size:16px">
+				<input type="submit" name="Save" value="Save" class="form_submit" style="width:100%;height:30px;font-size:16px">
 				</div></td></tr>
 		</table>
 		<?php
