@@ -5,7 +5,7 @@ include_once 'mutex.php';
 function GetExternalIP() {
 	$sGetIp = "http://ip4.me/";
 	$sAns = rtrim(implode(file($sGetIp), ""));
-	if(preg_match("#(\d+\.\d+\.\d+\.\d+)#i", $sAns, $aMatch)) 
+	if (preg_match("#(\d+\.\d+\.\d+\.\d+)#i", $sAns, $aMatch)) 
 	{ 
 		$nIP = $aMatch[1]; 
 		//echo "$nIP\n";	
@@ -13,10 +13,10 @@ function GetExternalIP() {
 		if (ip2long($nIP) >= 0) {
 			return $nIP;
 		} else {
-			echo "Invalid IP address: $nIP";
+			echo (new DateTime())->format(Valve::DATEFORMAT) . "Invalid IP address: $nIP" . PHP_EOL;
 		}	
 	} else {
-		echo "IP address not found in: $sAns";
+		echo (new DateTime())->format(Valve::DATEFORMAT) . "IP address not found in: $sAns" . PHP_EOL;
 	}	
 }
 
