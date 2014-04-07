@@ -4,6 +4,17 @@
 	
 	function GetMainMenu($Valves) {
 		echo '<table id="MainMenu" style="width:100%; table-layout:fixed">';
+
+		$sDaemonIniFilename = Valve::DEFAULTPATH . 'daemon.ini';
+		$mutex = new Mutex($sDaemonIniFilename);
+		$Daemon = parse_ini_file($sDaemonIniFilename, true);
+		$LastStart = DateTime::createFromFormat(Valve::DATEFORMAT, $Daemon["Daemon"]["Start"]);
+		$LastStart->add(DateInterval::createFromDateString('30 sec'));
+		$diff = (new DateTime())->diff($LastStart);
+		if ($diff->invert) {
+			echo '<tr><td><h1 style="color:red"> Error - background process is not running, manual operation only </h1></td></tr>';
+		}
+		
 		foreach ($Valves as $Key=>$Valve) {
 			echo "<tr><td><button type=submit name=Valve value=\"$Key\" class=menubutton>";
 			$Valve->GenerateMainMenuItem();
@@ -26,6 +37,12 @@
 			Design By Ronen Michaeli micronen@gmail.com<br/>
 			Based on template by <a href="http://www.mobifreaks.com" title="Mobifreaks.com">Mobifreaks.com</a><br/>
 			<p class="copy">Current time and date: <?=(new DateTime())->format(Valve::DATEFORMAT)?></p>
+			<?php
+//				$sDaemonIniFilename = Valve::DEFAULTPATH . 'daemon.ini';
+//				$mutex = new Mutex($sDaemonIniFilename);
+//				$Daemon = parse_ini_file($sDaemonIniFilename, true);
+//				echo '<pre>Daemon: '; print_r($Daemon); echo '</pre>';
+			?>
 		</div>
 		<?php
 	}
@@ -60,11 +77,11 @@
 </head>
 <body>
 	<div class="header">
-        <div class="logo">
-			<h1>Michaeli's PI Irrigation system</h1>
-            <a href="index.html"><img src="images/P2110259_small.jpg" alt="PI Irrigation Logo" /></a>
-		</div>
-    </div>
+	<div class="logo">
+		<h1>Michaeli's PI Irrigation system</h1>
+		<a href="index.html"><img src="images/P2110259_small.jpg" alt="PI Irrigation Logo" /></a>
+	</div>
+	</div>
     <div class="content"><?php	
 		if (!(new ValveHW())->hw_exists()) {
 			echo '<h2 style="text-align: center">NO HW FOUND - Simulation mode</h2>' . PHP_EOL;
