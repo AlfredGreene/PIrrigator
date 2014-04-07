@@ -1,5 +1,7 @@
 <?php
 
+include_once 'mutex.php';
+
 function ini_write($ini, $path, $has_sections=false) { 
     $content = ""; 
     if ($has_sections) { 
@@ -10,6 +12,8 @@ function ini_write($ini, $path, $has_sections=false) {
     } else { 
 		$content .= format_ini_section($ini);
     } 
+
+	$mutex = new Mutex($path);
 
     if (!$handle = fopen($path, 'w')) { 
         return false; 

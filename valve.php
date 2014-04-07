@@ -58,7 +58,6 @@ class Valve
 	}
 
 	function WriteINI() {
-		$mutex = new Mutex($this->filename);
 		ini_write($this->params, $this->filename, true);		
 	}
 	
