@@ -1,15 +1,18 @@
 <?php
 class Mutex {
+	const TIMEOUT = 10; // Time-out in seconds
     var $lockName = '';
     var $fileHandle = null;
 
     function __construct($lockName, $lock=1) {
         $this->lockName = $lockName . '.mutex';
-		if ($lock) {
-			while (!$this->getLock()) {
-				sleep(.5);
-			}
+		for ($i = 0; $i <= self::TIMEOUT; $i++) {
+			if ($this->getLock()) return true;
+			sleep(1);  // wait for the mutex to be free
 		}
+		// Unable to get mutex in time, force the mutex to free
+		releaseLock();
+		unlink($this->lockName);
     }
 
 	function __destruct() {
@@ -24,11 +27,11 @@ class Mutex {
     }
 
     function getLock() {
-        return flock($this->getFileHandle(), LOCK_EX);
+		return flock($this->getFileHandle(), LOCK_EX | LOCK_NB);
     }
 
     function releaseLock() {
-        $success = flock($this->getFileHandle(), LOCK_UN);
+        $success = flock($this->getFileHandle(), LOCK_UN | LOCK_NB);
         fclose($this->getFileHandle());
 		$this->fileHandle = null;
         return $success;
