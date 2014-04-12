@@ -8,7 +8,7 @@
 		$sDaemonIniFilename = Valve::DEFAULTPATH . 'daemon.ini';
 		$mutex = new Mutex($sDaemonIniFilename);
 		$Daemon = parse_ini_file($sDaemonIniFilename, true);
-		$LastStart = DateTime::createFromFormat(Valve::DATEFORMAT, $Daemon["Daemon"]["Start"]);
+		$LastStart = DateTime::createFromFormat(Valve::DATEFORMAT, $Daemon["Daemon"]["Finish"]);
 		$LastStart->add(DateInterval::createFromDateString('30 sec'));
 		$diff = (new DateTime())->diff($LastStart);
 		if ($diff->invert) {
