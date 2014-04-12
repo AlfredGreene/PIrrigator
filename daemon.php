@@ -29,22 +29,20 @@
 		} elseif ($pid) { 
 			// we are the parent
 			sleep(10);  // give the child up to this time to finish
+			pcntl_wait($status, WNOHANG); // Protect against Zombie children
+			if (pcntl_wifexited($status)) {
+				// Child finished normally, continue
+				continue;
+			}
+			
+			echo (new DateTime())->format(Valve::DATEFORMAT) . ': Child is still running, killing it.' . PHP_EOL;			
+			posix_kill($pid, SIGKILL); 
+			
 			if (posix_kill($pid, 0)) {
-				pcntl_wait($status, WNOHANG); // Protect against Zombie children
-				if (pcntl_wifexited($status)) {
-					// Child finished normally, continue
-					continue;
-				}
-				
-				echo (new DateTime())->format(Valve::DATEFORMAT) . ': Child is still running, killing it.' . PHP_EOL;			
-				posix_kill($pid, SIGKILL); 
-				
-				if (posix_kill($pid, 0)) {
-					echo (new DateTime())->format(Valve::DATEFORMAT) . ': Child is not dead, exiting.' . PHP_EOL;			
-					break;
-				} else {
-					echo (new DateTime())->format(Valve::DATEFORMAT) . ': Child is dead.' . PHP_EOL;			
-				}
+				echo (new DateTime())->format(Valve::DATEFORMAT) . ': Child is not dead, exiting.' . PHP_EOL;			
+				break;
+			} else {
+				echo (new DateTime())->format(Valve::DATEFORMAT) . ': Child is dead.' . PHP_EOL;			
 			}
 		} else {
 			// we are the child, do daemon work
