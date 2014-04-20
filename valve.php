@@ -7,12 +7,14 @@ class Valve
 {
 	const DEFAULTPATH = '/var/www-data/valves/';
 	const DATEDATEFORMAT = 'Y-m-d';
-	const DATETIMEFORMAT = 'H:i';
+	const DATETIMEFORMAT = 'H:i:s';
+	const DATETIMEFORMAT_NOSECONDS = 'H:i';
 	const DATEFORMAT = 'Y-m-d H:i:s';
 
 	const DURATIONFORMAT = '%r%H:%I';
-	const DURATIONLONGFORMAT = '%r%a days %H:%I';
-	const DURATIONDATEFORMAT = 'H:i';
+	const DURATIONLONGFORMAT = '%r%a days %H:%I:%S';
+	const DURATIONFORMAT_WITHSECS = '%r%H:%I:%S';
+	const DURATIONLONGFORMAT_PARSE = '%d days %d:%d:%d';
 	
 	public $params = [
 		"General" => [
@@ -103,7 +105,11 @@ class Valve
 	}
 	
 	function FormatAutoTime() {
-		return DateTime::createFromFormat(self::DURATIONDATEFORMAT, $this->params["Auto"]["At"])->format(self::DATETIMEFORMAT);
+		$t = DateTime::createFromFormat(self::DATETIMEFORMAT, $this->params["Auto"]["At"]);
+		if (DateTime::getLastErrors()["error_count"] > 0) {
+			$t = DateTime::createFromFormat(self::DATETIMEFORMAT_NOSECONDS, $this->params["Auto"]["At"]);
+		}
+		return $t->format(self::DATETIMEFORMAT);
 	}
 
 	function FormatAutoInterval() {
@@ -150,7 +156,7 @@ class Valve
 		if ($this->params["Status"]["Manual"]) {
 			$at = DateTime::createFromFormat(self::DATEFORMAT, $this->params["Manual"]["At"]);
 		} elseif ($this->params["Status"]["Auto"]) {
-			$at = DateTime::createFromFormat(self::DURATIONDATEFORMAT, $this->params["Auto"]["At"]);
+			$at = DateTime::createFromFormat(self::DATETIMEFORMAT, $this->params["Auto"]["At"]);
 			$last = end($this->params["History"]["Dates"]);
 			if (empty($last)) {
 				if ($at < new DateTime()) $at->add(new DateInterval("P1D"));

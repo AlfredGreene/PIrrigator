@@ -53,12 +53,12 @@ class ValveDisplay extends Valve
 			if ($left->days != 0) {
 				$left = $left->format(self::DURATIONLONGFORMAT);
 			} else {
-				$left = $left->format(self::DURATIONFORMAT);
+				$left = $left->format(self::DURATIONFORMAT_WITHSECS);
 			}
 			echo "<span class={$ClassType}_opened>$OpType open, $left time left<br>Started at $s[Start]</span>";
 		} else {
 			if ($s["Manual"] || $s["Auto"]) {
-				$duration = $this->OpenDuration()->format(self::DURATIONFORMAT);
+				$duration = $this->OpenDuration()->format(self::DURATIONFORMAT_WITHSECS);
 				if ($this->ShouldOpen()) {
 					$TimeToOpen = 'ASAP';
 				} else {
@@ -86,7 +86,7 @@ class ValveDisplay extends Valve
 		}
 		?>
 		<table id="form-header"><tr>
-			<td style="border-right:2px solid #e3f2f9"><img style="height:64px" src="<?=$this->params['General']['Image']?>"/></td>
+			<td class=valve_image style="border-right:2px solid #e3f2f9"><img style="height:64px" src="<?=$this->params['General']['Image']?>"/></td>
 			<td><h1><?=$this->params['General']['Name']?></h1></td>
 			<td style="border-left:2px solid #e3f2f9">
 				<?php if ($this->IsOpen()) { $Op = 'Close'; $Class = 'closed'; } else { $Op = 'Open'; $Class = 'opened'; } ?>
@@ -152,14 +152,45 @@ class ValveDisplay extends Valve
 			echo "<option value=\"$Key\"" . (($Key==$Selected) ? ' selected' : '') . ">$Value</option>";
 	}
 
-	function GenerateHistoryTable() {
+	function GenerateHistoryTable() {	
 		echo '<div class=history><table id=history>';
-		echo '<tr><th>#</th><th>Date</th><th>Duration</th></tr>';
+		echo '<tr><th>#</th><th>Date</th><th>Duration</th><th>Time Difference</th></tr>';
 		$alt = false;
+		$prev = false;  //new DateTime();
 		foreach ($this->params['History']['Dates'] as $Key=>$Date) {
 			$Duration = $this->params['History']['Durations'][$Key];
-			echo "<tr"; if ($alt) " class=alt"; $alt = !$alt;
-			echo "><td>$Key</td><td>$Date</td><td>$Duration</td></tr>";
+			
+			// Remove error entries
+			$Dur = new DateInterval("PT1S");
+			list($Dur->d, $Dur->h, $Dur->i, $Dur->s) = sscanf($Duration, self::DURATIONLONGFORMAT_PARSE);
+			$DurGt1D = (new DateTime())->add($Dur) > (new DateTime())->add(new DateInterval("P1D"));
+			$DurLt1S = (new DateTime())->add($Dur) <= (new DateTime())->add(new DateInterval("PT1S"));
+			if ($DurGt1D || $DurLt1S)  {
+				continue;
+			} 
+			
+			// Remove 'days' text when the duration is less than a day
+			if ($Dur->days == 0) {
+				$Duration = $Dur->format(self::DURATIONFORMAT_WITHSECS);
+			}			
+			
+			// Calculate time between opens
+			$d = DateTime::createFromFormat(self::DATEFORMAT, $Date);
+			if ($prev) {
+				$diff = $prev->diff($d);
+				$diff = $diff->format(self::DURATIONLONGFORMAT);
+			} else {
+				$diff = "";
+			}
+			$prev = $d;
+						
+			// Add the row to the table
+			echo "<tr"; if ($alt) echo " class=alt"; $alt = !$alt; echo ">";
+			echo "<td>$Key</td>";
+			echo "<td>$Date</td>";
+			echo "<td>$Duration</td>";
+			echo "<td>$diff</td>";
+			echo "</tr>";
 		}
 		echo '</table></div>';
 	}
