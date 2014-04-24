@@ -11,7 +11,7 @@ class Mutex {
 			sleep(1);  // wait for the mutex to be free
 		}
 		// Unable to get mutex in time, force the mutex to free
-		releaseLock();
+		$this->releaseLock();
 		unlink($this->lockName);
     }
 
