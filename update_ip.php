@@ -9,9 +9,10 @@ function GetExternalIP() {
 	if (preg_match("#(\d+\.\d+\.\d+\.\d+)#i", $sAns, $aMatch)) 
 	{ 
 		$nIP = $aMatch[1]; 
-		//echo "$nIP\n";	
+	//	echo "|$nIP|" . PHP_EOL;
+	//	echo ip2long($nIP) . PHP_EOL;
 
-		if (ip2long($nIP) >= 0) {
+		if (ip2long($nIP) != 0) {
 			return $nIP;
 		} else {
 			echo (new DateTime())->format(Valve::DATEFORMAT) . ": Invalid IP address: $nIP" . PHP_EOL;
