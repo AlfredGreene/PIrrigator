@@ -4,3 +4,4 @@
 	$LOG = Valve::DEFAULTPATH . 'daemon.log';
 	
 	exec("./daemon_main.php >> $LOG 2>&1");
+ 
