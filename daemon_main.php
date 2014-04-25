@@ -30,11 +30,12 @@
 			}
 		} else {
 			// we are the child, do daemon work
-			UpdateValves($sIniFilename);
-			if ($iCounter % 10 == 0) {
-				UpdateIP($sIniFilename);
+			if (!UpdateValves($sIniFilename)) {
+				if ($iCounter > 10) {
+					UpdateIP($sIniFilename);
+					$iCounter = 0;
+				}
 			}
-			
 			// The child finished it's job, kill it.
 			die;
 		}
@@ -76,6 +77,7 @@ function WaitForChild() {
 }
 
 function UpdateValves($sIniFilename) {
+	$bValveIsOpenedOrShouldOpen = false;
 	// Update daemon status in ini file
 	$params = parse_ini_file($sIniFilename, true);
 	
@@ -95,11 +97,15 @@ function UpdateValves($sIniFilename) {
 					$Valve->DoClose();
 					echo (new DateTime())->format(Valve::DATEFORMAT) . ': Closing ' . $Valve->params['General']['Name'] . PHP_EOL;
 				}
+				$bValveIsOpenedOrShouldOpen = true;
 			} else { 
 //					echo (new DateTime())->format(Valve::DATEFORMAT) . ': ' . $Valve->params['General']['Name'] . ' Is Closed' . PHP_EOL;
-				if ($Valve->ShouldOpen() && $Valve->CanOpen()) {
-					$Valve->DoOpen();
-					echo (new DateTime())->format(Valve::DATEFORMAT) . ': Opening ' . $Valve->params['General']['Name'] . PHP_EOL;
+				if ($Valve->ShouldOpen()) {
+					$bValveIsOpenedOrShouldOpen = true;
+					if ($Valve->CanOpen()) {
+						$Valve->DoOpen();
+						echo (new DateTime())->format(Valve::DATEFORMAT) . ': Opening ' . $Valve->params['General']['Name'] . PHP_EOL;
+					}
 				}
 			}
 		}
@@ -108,6 +114,8 @@ function UpdateValves($sIniFilename) {
 	// Update daemon status in ini file
 	$params["Daemon"]["Finish"] = (new DateTime())->format(Valve::DATEFORMAT);
 	ini_write($params, $sIniFilename, true);		
+	
+	return $bValveIsOpenedOrShouldOpen;
 }
 
 function UpdateIP($sIniFilename) {
