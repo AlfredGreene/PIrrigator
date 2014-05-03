@@ -10,13 +10,11 @@ class Mutex {
 			if ($this->getLock()) return true;
 			sleep(1);  // wait for the mutex to be free
 		}
-		// Unable to get mutex in time, force the mutex to free
-		$this->releaseLock();
-		unlink($this->lockName);
     }
 
 	function __destruct() {
 		$this->releaseLock();
+//		unlink($this->lockName);
 	}
 
     function getFileHandle() {
@@ -31,9 +29,11 @@ class Mutex {
     }
 
     function releaseLock() {
-        $success = flock($this->getFileHandle(), LOCK_UN | LOCK_NB);
-        fclose($this->getFileHandle());
-		$this->fileHandle = null;
+		if ($this->fileHandle != null) {
+			$success = flock($this->fileHandle, LOCK_UN | LOCK_NB);
+			fclose($this->getFileHandle());
+			$this->fileHandle = null;
+		}
         return $success;
     }
 }
