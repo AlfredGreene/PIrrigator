@@ -22,7 +22,7 @@
 		} elseif ($pid) { 
 			// we are the parent
 			sleep(10);  // give the child up to this time to finish
-			if (WaitForChild()) {
+			if (WaitForChild($pid)) {
 				continue;
 			} else {
 				echo (new DateTime())->format(Valve::DATEFORMAT) . ': Error could not kill child, exiting.' . PHP_EOL;
@@ -50,7 +50,7 @@
 	
 /////////////////////////////////////////////////////////////////////////////////////////
 	
-function WaitForChild() {
+function WaitForChild($pid) {
 	pcntl_wait($status, WNOHANG); // Protect against Zombie children
 	if (pcntl_wifexited($status)) {
 		// Child finished normally, continue
