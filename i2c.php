@@ -1,4 +1,7 @@
 <?php
+
+include_once 'globals.php';
+
 class I2C
 {	
 	private $addr; 	 		// and address of the unit being communicated with ( set when instantiated )
@@ -38,12 +41,12 @@ class I2C
 				$ans = trim(shell_exec('/usr/sbin/i2cget -y ' . $this->addr . ' ' . $register . ' 2>&1'));
 				if (strcmp($ans, 'Error: Read failed') != 0) {
 					if ($i > 0) {
-						error_log('Warning reading from ' . $this->addr . ' ' . $register . ' took ' . $i . 'tries' . PHP_EOL);
+						error_log(NOW() . 'Warning reading from ' . $this->addr . ' ' . $register . ' took ' . $i . ' tries' . PHP_EOL);
 					}
 					return intval($ans, 16);
 				}
 			}
-			error_log('Error reading from ' . $this->addr . ' ' . $register . PHP_EOL);
+			error_log(NOW() . 'Error reading from ' . $this->addr . ' ' . $register . PHP_EOL);
 			return 0;
 		} else {
 			$f = fopen($this->hwsim, 'r');
@@ -59,12 +62,12 @@ class I2C
 				shell_exec('/usr/sbin/i2cset -y ' . $this->addr . ' ' . $register . ' ' . $value . ' 2>&1' );
 				if ($this->read_register($register) == $value) {
 					if ($i > 0) {
-						error_log('Warning writing value ' . $value . ' to ' . $this->addr . ' ' . $register . ' took ' . $i . 'tries' . PHP_EOL);
+						error_log(NOW() . 'Warning writing value ' . $value . ' to ' . $this->addr . ' ' . $register . ' took ' . $i . ' tries' . PHP_EOL);
 					}
 					return;
 				}
 			}
-			error_log('Error writing value ' . $value . ' to ' . $this->addr . ' ' . $register . ' read: ' . $this->read_register($register) . PHP_EOL);
+			error_log(NOW() . 'Error writing value ' . $value . ' to ' . $this->addr . ' ' . $register . ' read: ' . $this->read_register($register) . PHP_EOL);
 		} else {
 			$f = fopen($this->hwsim, 'w');
 			fwrite($f, $value);

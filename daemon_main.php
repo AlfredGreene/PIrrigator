@@ -1,11 +1,11 @@
 #!/usr/bin/php
 <?php
+	include_once 'globals.php';
 	include_once 'valve.php';
 	include_once 'ValveHW.php';
 	include_once 'update_ip.php';
-	$sIniFilename = Valve::DEFAULTPATH . 'daemon.ini';
 		
-	echo (new DateTime())->format(Valve::DATEFORMAT) . ': Starting daemon' . PHP_EOL;
+	echo NOW() . 'Starting daemon' . PHP_EOL;
 
 	$HW = new ValveHW;
 	$HW->CloseAll();	// Close all values
@@ -17,7 +17,7 @@
 		
 		$pid=pcntl_fork(); 
 		if ($pid == -1) {
-			echo (new DateTime())->format(Valve::DATEFORMAT) . ': Error could not fork, exiting.' . PHP_EOL;
+			echo NOW() . 'Error could not fork, exiting.' . PHP_EOL;
 			break;
 		} elseif ($pid) { 
 			// we are the parent
@@ -25,14 +25,14 @@
 			if (WaitForChild($pid)) {
 				continue;
 			} else {
-				echo (new DateTime())->format(Valve::DATEFORMAT) . ': Error could not kill child, exiting.' . PHP_EOL;
-				DumpIni($sIniFilename);
+				echo NOW() . 'Error could not kill child, exiting.' . PHP_EOL;
+				DumpIni();
 			}
 		} else {
 			// we are the child, do daemon work
-			if (!UpdateValves($sIniFilename)) {
+			if (!UpdateValves()) {
 				if ($iCounter > 10) {
-					UpdateIP($sIniFilename);
+					UpdateIP();
 					$iCounter = 0;
 				}
 			}
@@ -40,13 +40,13 @@
 			die;
 		}
 	}
-	echo (new DateTime())->format(Valve::DATEFORMAT) . ': Closing all valves' . PHP_EOL;
+	echo NOW() . 'Closing all valves' . PHP_EOL;
 	$HW = new ValveHW;
 	$HW->CloseAll();	// Close all values
 	
-	echo (new DateTime())->format(Valve::DATEFORMAT) . ': Stopping daemon' . PHP_EOL;
+	echo NOW() . 'Stopping daemon' . PHP_EOL;
 
-	exec("mail -s 'PI daemon is down' micronen@gmail.com < $sIniFilename");
+	exec("mail -s 'PI daemon is down' micronen@gmail.com < " . DAEMONINI);
 	
 /////////////////////////////////////////////////////////////////////////////////////////
 	
@@ -57,7 +57,7 @@ function WaitForChild($pid) {
 		return true;
 	}
 	
-	echo (new DateTime())->format(Valve::DATEFORMAT) . ': Child is still running, killing it.' . PHP_EOL;			
+	echo NOW() . 'Child is still running, killing it.' . PHP_EOL;			
 	posix_kill($pid, SIGKILL); 
 
 	sleep(10);  // give the child up to this time to finish
@@ -68,43 +68,43 @@ function WaitForChild($pid) {
 	}
 	
 	if (posix_kill($pid, 0)) {
-		echo (new DateTime())->format(Valve::DATEFORMAT) . ': Child is not dead, exiting.' . PHP_EOL;			
+		echo NOW() . 'Child is not dead, exiting.' . PHP_EOL;			
 		return false;
 	} else {
-		echo (new DateTime())->format(Valve::DATEFORMAT) . ': Child is dead.' . PHP_EOL;			
+		echo NOW() . 'Child is dead.' . PHP_EOL;			
 		return true;
 	}
 }
 
-function UpdateValves($sIniFilename) {
+function UpdateValves() {
 	$bValveIsOpenedOrShouldOpen = false;
 	// Update daemon status in ini file
-	$params = parse_ini_file($sIniFilename, true);
+	$params = parse_ini_file(DAEMONINI, true);
 	
-	$params["Daemon"]["Start"] = (new DateTime())->format(Valve::DATEFORMAT);
-	ini_write($params, $sIniFilename, true);					
+	$params["Daemon"]["Start"] = (new DateTime())->format(LOGDATEFORMAT);
+	ini_write($params, DAEMONINI, true);					
 
 	$Valves = GetValvesList();
-	$params["Daemon"]["GetValvesList"] = (new DateTime())->format(Valve::DATEFORMAT);
+	$params["Daemon"]["GetValvesList"] = (new DateTime())->format(LOGDATEFORMAT);
 	if (!empty($Valves)) {
 		foreach($Valves as $Valve) {	
-			$params["Daemon"][$Valve->filename] = (new DateTime())->format(Valve::DATEFORMAT);
-			ini_write($params, $sIniFilename, true);	
+			$params["Daemon"][$Valve->filename] = (new DateTime())->format(LOGDATEFORMAT);
+			ini_write($params, DAEMONINI, true);	
 			
 			if ($Valve->IsOpen()) {
-//					echo (new DateTime())->format(Valve::DATEFORMAT) . ': ' . $Valve->params['General']['Name'] . ' Is Opened' . PHP_EOL;
+//					echo NOW() . '' . $Valve->params['General']['Name'] . ' Is Opened' . PHP_EOL;
 				if ($Valve->ShouldClose()) {
 					$Valve->DoClose();
-					echo (new DateTime())->format(Valve::DATEFORMAT) . ': Closing ' . $Valve->params['General']['Name'] . PHP_EOL;
+					echo NOW() . 'Closing ' . $Valve->params['General']['Name'] . PHP_EOL;
 				}
 				$bValveIsOpenedOrShouldOpen = true;
 			} else { 
-//					echo (new DateTime())->format(Valve::DATEFORMAT) . ': ' . $Valve->params['General']['Name'] . ' Is Closed' . PHP_EOL;
+//					echo NOW() . '' . $Valve->params['General']['Name'] . ' Is Closed' . PHP_EOL;
 				if ($Valve->ShouldOpen()) {
 					$bValveIsOpenedOrShouldOpen = true;
 					if ($Valve->CanOpen()) {
 						$Valve->DoOpen();
-						echo (new DateTime())->format(Valve::DATEFORMAT) . ': Opening ' . $Valve->params['General']['Name'] . PHP_EOL;
+						echo NOW() . 'Opening ' . $Valve->params['General']['Name'] . PHP_EOL;
 					}
 				}
 			}
@@ -112,41 +112,41 @@ function UpdateValves($sIniFilename) {
 	}
 	
 	// Update daemon status in ini file
-	$params["Daemon"]["Finish"] = (new DateTime())->format(Valve::DATEFORMAT);
-	ini_write($params, $sIniFilename, true);		
+	$params["Daemon"]["Finish"] = (new DateTime())->format(LOGDATEFORMAT);
+	ini_write($params, DAEMONINI, true);		
 	
 	return $bValveIsOpenedOrShouldOpen;
 }
 
-function UpdateIP($sIniFilename) {
+function UpdateIP() {
 	// Update daemon status in ini file
-	$params = parse_ini_file($sIniFilename, true);
+	$params = parse_ini_file(DAEMONINI, true);
 	
 	// Update daemon status in ini file
-	$params["Daemon"]["UpdateIP"] = (new DateTime())->format(Valve::DATEFORMAT);
-	ini_write($params, $sIniFilename, true);		
+	$params["Daemon"]["UpdateIP"] = (new DateTime())->format(LOGDATEFORMAT);
+	ini_write($params, DAEMONINI, true);		
 
 	update_ip();
 	
 	// Update daemon status in ini file
-	$params["Daemon"]["FinishUpdateIP"] = (new DateTime())->format(Valve::DATEFORMAT);
-	ini_write($params, $sIniFilename, true);		
+	$params["Daemon"]["FinishUpdateIP"] = (new DateTime())->format(LOGDATEFORMAT);
+	ini_write($params, DAEMONINI, true);		
 }	
 
-function DumpIni($sIniFilename) {
+function DumpIni() {
 	// Dump child status to log
 	$pid=pcntl_fork(); 
 	if ($pid == -1) {
-		echo (new DateTime())->format(Valve::DATEFORMAT) . ': Error could not fork, exiting.' . PHP_EOL;
+		echo NOW() . 'Error could not fork, exiting.' . PHP_EOL;
 		break;
 	} elseif ($pid) { 
 		// we are the parent
 		sleep(10);  // give the child up to this time to finish
-		echo (new DateTime())->format(Valve::DATEFORMAT) . ': Finished dumping, exiting.' . PHP_EOL;
+		echo NOW() . 'Finished dumping, exiting.' . PHP_EOL;
 		break; 
 	} else {
 		// we are the child, dump status to log
-		$params = parse_ini_file($sIniFilename, true);
+		$params = parse_ini_file(DAEMONINI, true);
 		echo print_r($params) . PHP_EOL;
 		die;
 	}

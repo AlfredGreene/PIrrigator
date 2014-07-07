@@ -1,14 +1,14 @@
 <?php
+	include_once 'globals.php';
 	include_once 'ValveDisplay.php';
 	include_once 'ValveHW.php';
 	
 	function GetMainMenu($Valves) {
 		echo '<table id="MainMenu" style="width:100%; table-layout:fixed">';
 
-		$sDaemonIniFilename = Valve::DEFAULTPATH . 'daemon.ini';
-		$mutex = new Mutex($sDaemonIniFilename);
-		$Daemon = parse_ini_file($sDaemonIniFilename, true);
-		$LastStart = DateTime::createFromFormat(Valve::DATEFORMAT, $Daemon["Daemon"]["Finish"]);
+		$mutex = new Mutex(DAEMONINI);
+		$Daemon = parse_ini_file(DAEMONINI, true);
+		$LastStart = DateTime::createFromFormat(LOGDATEFORMAT, $Daemon["Daemon"]["Finish"]);
 		$LastStart->add(DateInterval::createFromDateString('30 sec'));
 		$diff = (new DateTime())->diff($LastStart);
 		if ($diff->invert) {
@@ -36,11 +36,10 @@
 			&copy; 2013 pi.micronen.mooo.com | All right reserved<br/>
 			Design By Ronen Michaeli micronen@gmail.com<br/>
 			Based on template by <a href="http://www.mobifreaks.com" title="Mobifreaks.com">Mobifreaks.com</a><br/>
-			<p class="copy">Current time and date: <?=(new DateTime())->format(Valve::DATEFORMAT)?></p>
+			<p class="copy">Current time and date: <?=(new DateTime())->format(LOGDATEFORMAT)?></p>
 			<?php
-//				$sDaemonIniFilename = Valve::DEFAULTPATH . 'daemon.ini';
-//				$mutex = new Mutex($sDaemonIniFilename);
-//				$Daemon = parse_ini_file($sDaemonIniFilename, true);
+//				$mutex = new Mutex(DAEMONINI);
+//				$Daemon = parse_ini_file(DAEMONINI, true);
 //				echo '<pre>Daemon: '; print_r($Daemon); echo '</pre>';
 			?>
 		</div>
