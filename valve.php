@@ -5,7 +5,6 @@ include_once 'ValveHW.php';
 
 class Valve
 {
-	const DEFAULTPATH = '/var/www-data/valves/';
 	const DATEDATEFORMAT = 'Y-m-d';
 	const DATETIMEFORMAT = 'H:i:s';
 	const DATETIMEFORMAT_NOSECONDS = 'H:i';
@@ -186,6 +185,7 @@ class Valve
 					if ($at < $wait) { 
 						$at->add(new DateInterval("P1D"));
 					} else {
+						$at->sub(new DateInterval("P1D"));
 						break;
 					}
 				}
@@ -206,7 +206,7 @@ class Valve
 	}
 }
 
-function GetValvesList($class_name = 'Valve', $path = Valve::DEFAULTPATH) {
+function GetValvesList($class_name = 'Valve', $path = DEFAULTPATH) {
 	$files = glob($path . '*.vlv');
 	if (empty($files)) {
 		return null;
