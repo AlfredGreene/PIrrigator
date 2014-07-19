@@ -21,8 +21,8 @@
 			break;
 		} elseif ($pid) { 
 			// we are the parent
-			sleep(10);  // give the child up to this time to finish
 			if (WaitForChild($pid)) {
+				sleep(10);
 				continue;
 			} else {
 				echo NOW() . 'Error could not kill child, exiting.' . PHP_EOL;
@@ -51,27 +51,32 @@
 /////////////////////////////////////////////////////////////////////////////////////////
 	
 function WaitForChild($pid) {
-	pcntl_wait($status, WNOHANG); // Protect against Zombie children
-	if (pcntl_wifexited($status)) {
-		// Child finished normally, continue
-		return true;
+	// Wait for child to terminate
+	for ($i = 0; $i < 20; $i++) {
+		sleep(5);
+		if (pcntl_waitpid($pid, $status, WNOHANG) && pcntl_wifexited($status)) {
+//			echo NOW() . $pid . ' Child finished normally. ' . $i . PHP_EOL;			
+			// Child finished normally, continue
+			return true;
+		}
 	}
-	
-	echo NOW() . 'Child is still running, killing it.' . PHP_EOL;			
+		
+	echo NOW() . $pid . ' Child is still running, killing it.' . PHP_EOL;			
 	posix_kill($pid, SIGKILL); 
+	
+	sleep(10);
 
-	sleep(10);  // give the child up to this time to finish
-	pcntl_wait($status, WNOHANG); // Protect against Zombie children
-	if (pcntl_wifexited($status)) {
+	if (pcntl_waitpid($pid, $status, WNOHANG) && pcntl_wifexited($status)) {
+		echo NOW() . $pid . ' Child killed.' . PHP_EOL;			
 		// Child finished normally, continue
 		return true;
 	}
 	
 	if (posix_kill($pid, 0)) {
-		echo NOW() . 'Child is not dead, exiting.' . PHP_EOL;			
+		echo NOW() . $pid . ' Child is not dead, exiting.' . PHP_EOL;			
 		return false;
 	} else {
-		echo NOW() . 'Child is dead.' . PHP_EOL;			
+		echo NOW() . $pid . ' Child is dead.' . PHP_EOL;			
 		return true;
 	}
 }
@@ -87,29 +92,35 @@ function UpdateValves() {
 	$Valves = GetValvesList();
 	$params["Daemon"]["GetValvesList"] = (new DateTime())->format(LOGDATEFORMAT);
 	if (!empty($Valves)) {
-		foreach($Valves as $Valve) {	
-			$params["Daemon"][$Valve->filename] = (new DateTime())->format(LOGDATEFORMAT);
-			ini_write($params, DAEMONINI, true);	
-			
+		foreach($Valves as $Valve) {				
 			if ($Valve->IsOpen()) {
-//					echo NOW() . '' . $Valve->params['General']['Name'] . ' Is Opened' . PHP_EOL;
+				$params["Daemon"][$Valve->filename] = 'Is Opened ' . (new DateTime())->format(LOGDATEFORMAT);
+//				echo NOW() . getmypid() . ' ' . $Valve->params['General']['Name'] . ' Is Opened' . PHP_EOL;
 				if ($Valve->ShouldClose()) {
+					$params["Daemon"][$Valve->filename] = 'Closing ' . (new DateTime())->format(LOGDATEFORMAT);
 					$Valve->DoClose();
 					echo NOW() . 'Closing ' . $Valve->params['General']['Name'] . PHP_EOL;
 				}
 				$bValveIsOpenedOrShouldOpen = true;
 			} else { 
-//					echo NOW() . '' . $Valve->params['General']['Name'] . ' Is Closed' . PHP_EOL;
+				$params["Daemon"][$Valve->filename] = 'Is Closed ' . (new DateTime())->format(LOGDATEFORMAT);
+//				echo NOW() . getmypid() . ' ' . $Valve->params['General']['Name'] . ' Is Closed' . PHP_EOL;
 				if ($Valve->ShouldOpen()) {
+					$params["Daemon"][$Valve->filename] = 'Should Open ' . (new DateTime())->format(LOGDATEFORMAT);
+//					echo NOW() . getmypid() .  $Valve->params['General']['Name'] . ' Should Open' . PHP_EOL;
 					$bValveIsOpenedOrShouldOpen = true;
 					if ($Valve->CanOpen()) {
+						$params["Daemon"][$Valve->filename] = 'Opening ' . (new DateTime())->format(LOGDATEFORMAT);
 						$Valve->DoOpen();
 						echo NOW() . 'Opening ' . $Valve->params['General']['Name'] . PHP_EOL;
 					}
 				}
 			}
+			ini_write($params, DAEMONINI, true);			
 		}
 	}
+
+//	echo NOW() . getmypid() . ' Finished' . PHP_EOL;
 	
 	// Update daemon status in ini file
 	$params["Daemon"]["Finish"] = (new DateTime())->format(LOGDATEFORMAT);
