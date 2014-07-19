@@ -20,7 +20,7 @@ class ValveDisplay extends Valve
 		echo "<table style='width:99%'><tr>";
 		echo "<td rowspan=3 class=valve_image style=width:95><img src=\"$g[Image]\"/></td>";
 		echo "<td><span style='font-size:18px; font-weight:bold;'>$g[Name]</span></td></tr>";
-
+		
 		echo "<tr><td><span style='font-size:12px; font-weight:bold;'>";
 		if ($s["Auto"]) {
 			echo "Opens for {$this->FormatAutoDuration()} at {$this->FormatAutoTime()} every {$this->FormatAutoInterval()}";
@@ -33,6 +33,7 @@ class ValveDisplay extends Valve
 		if (!$s["Auto"] && !$s["Manual"]) {
 			echo '<span style="color:red">Scheduled operation is disabled</span>';
 		}
+		if ($this->CanOpen() && $this->ShouldOpen()) echo "<span>  Should Open</span>";
 		echo "</td></tr>";
 
 		echo "<tr><td>";
