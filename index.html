@@ -9,7 +9,7 @@
 		$mutex = new Mutex(DAEMONINI);
 		$Daemon = parse_ini_file(DAEMONINI, true);
 		$LastStart = DateTime::createFromFormat(LOGDATEFORMAT, $Daemon["Daemon"]["Finish"]);
-		$LastStart->add(DateInterval::createFromDateString('30 sec'));
+		$LastStart->add(DateInterval::createFromDateString('120 sec'));
 		$diff = (new DateTime())->diff($LastStart);
 		if ($diff->invert) {
 			echo '<tr><td><h1 style="color:red"> Error - background process is not running, manual operation only </h1></td></tr>';
