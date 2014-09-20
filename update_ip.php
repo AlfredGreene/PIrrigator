@@ -7,7 +7,7 @@ function GetExternalIP() {
 	$sGetIp = "http://ip4.me/";
 	$sAns = file($sGetIp);
 	if ($sAns == false) {
-		echo NOW() . $sGetIP . " is not accessible" . PHP_EOL;
+		echo NOW() . $sGetIp . " is not accessible" . PHP_EOL;
 		return;
 	}
 	
