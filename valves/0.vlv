@@ -8,15 +8,11 @@ At = "4:30"
 Interval = "P3D"
 [Manual]
 Duration = "PT1H0M"
-At = "2014-03-07 15:08:00"
+At = "2014-07-31 18:57:00"
 [Status]
-Manual = "0"
-Auto = "0"
-Start = "2014-03-07 15:08:21"
+Manual = 
+Auto = 
+Start = "2014-10-20 04:30:08"
 [History]
-Dates[] = "2014-03-07 13:52:13"
-Dates[] = "2014-03-07 13:59:00"
-Dates[] = "2014-03-07 15:08:21"
-Durations[] = "0 days 00:00"
-Durations[] = "0 days 00:00"
-Durations[] = "0 days 00:58"
+Dates[] = "2014-10-20 04:30:08"
+Durations[] = "0 days 01:00:10"

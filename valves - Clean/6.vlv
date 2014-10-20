@@ -1,0 +1,18 @@
+[General]
+Name = "תבלינים"
+Image = "images/P4020229_small.jpg"
+HWID = "6"
+[Auto]
+Duration = "PT1H0M"
+At = "4:30"
+Interval = "P3D"
+[Manual]
+Duration = "PT1H0M"
+At = "2014-07-31 18:57:31"
+[Status]
+Manual = 
+Auto = 
+Start = "2014-10-18 06:30:29"
+[History]
+Dates[] = "2014-10-20 04:30:08"
+Durations[] = "0 days 01:00:10"

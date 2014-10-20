@@ -11,12 +11,8 @@ Duration = "PT1H0M"
 At = "2014-03-07 14:01:00"
 [Status]
 Manual = 
-Auto = "0"
-Start = "2014-03-07 16:46:25"
+Auto = 
+Start = "2014-10-18 07:30:29"
 [History]
-Dates[] = "2014-03-07 13:52:29"
-Dates[] = "2014-03-07 13:53:24"
-Dates[] = "2014-03-07 16:46:25"
-Durations[] = "0 days 00:00"
-Durations[] = "0 days 00:01"
-Durations[] = "0 days 01:00"
+Dates[] = "2014-10-20 04:30:08"
+Durations[] = "0 days 01:00:10"
