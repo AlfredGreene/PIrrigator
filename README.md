@@ -34,6 +34,8 @@ AddHandler application/x-httpd-php .html
 	  sudo nano /etc/modules
            i2c-bcm2708
            i2c-dev
+	  if any problems see https://www.raspberrypi.org/forums/viewtopic.php?t=97314   
+		   
    
    Add root SMB share:
    sudo apt-get install samba samba-common-bin winbind smbclient
