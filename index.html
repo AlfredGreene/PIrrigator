@@ -16,9 +16,11 @@
 		}
 		
 		foreach ($Valves as $Key=>$Valve) {
-			echo "<tr><td><button type=submit name=Valve value=\"$Key\" class=menubutton>";
+			echo "<tr><td><form action='' method='post' name='Valve$Key'>";
+			echo "<input type='hidden' name='Valve' value=\"$Key\">";
+			echo "<button type=submit class=menubutton>";
 			$Valve->GenerateMainMenuItem();
-			echo "</button></td></tr>";
+			echo "</button></form></td></tr>";
 		}
 		?>		
 		<tr><td style='padding:5px'><input type="submit" class="menubutton2" style='margin:auto' name="GlobalAction" value="Enable automatic timers"</td></tr>
@@ -164,6 +166,6 @@
 		if (isset($_SERVER)) { echo '<pre>Server: '; print_r($_SERVER); echo '</pre>'; }
 		?>
 	</div>
-//-->
+-->
 </body>
 </html>

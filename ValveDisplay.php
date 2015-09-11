@@ -16,10 +16,12 @@ class ValveDisplay extends Valve
 		$a = $this->params["Auto"];
 		$s = $this->params["Status"];
 		$m = $this->params["Manual"];
-
+		if ($this->IsOpen()) { $Op = 'Close'; $Class = 'closed'; } else { $Op = 'Open'; $Class = 'opened'; };
+	
 		echo "<table style='width:99%'><tr>";
-		echo "<td rowspan=3 class=valve_image style=width:95><img src=\"$g[Image]\"/></td>";
-		echo "<td><span style='font-size:18px; font-weight:bold;'>$g[Name]</span></td></tr>";
+		echo "<td rowspan=3 class=valve_image style=width:95><input type='image' name='$Op' value='$Op' src=\"$g[Image]\"/></td>";
+		echo "<td><span style='font-size:18px; font-weight:bold;'>$g[Name]</span></td>";
+		echo "</tr>";
 		
 		echo "<tr><td><span style='font-size:12px; font-weight:bold;'>";
 		if ($s["Auto"]) {
