@@ -200,7 +200,7 @@ class Valve
 	function ManualOpenNow() {
 		$this->params['Status']['Manual'] = 1;
 		$this->params['Manual']['At'] = (new DateTime())->format(self::DATEFORMAT);
-		$this->params['Manual']['Duration'] = 'PT1H0M';
+//		$this->params['Manual']['Duration'] = 'PT1H0M';
 		$this->DoOpen();
 		$this->WriteINI();
 	}
