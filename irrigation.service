@@ -1,0 +1,10 @@
+[Unit]
+Description=Dynamic DNS
+
+[Service]
+Type=simple
+ExecStart=/var/www/html/daemon.php
+
+[Install]
+WantedBy=multi-user.target
+

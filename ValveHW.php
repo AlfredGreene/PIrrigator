@@ -5,7 +5,7 @@ include_once 'mutex.php';
 
 class ValveHW
 {	
-	const mutex = '/var/www-data/valves/i2c';
+	const mutex = '/var/www/html/valves/i2c';
 	static private $i2c = null;
 	
 	function __construct() {

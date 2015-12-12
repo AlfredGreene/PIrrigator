@@ -1,6 +1,6 @@
 <?php
 	define('LOGDATEFORMAT', 'Y-m-d H:i:s');
-	define('DEFAULTPATH', '/var/www-data/valves/');
+	define('DEFAULTPATH', '/var/www/html/valves/');
 	define('DAEMONINI', DEFAULTPATH . 'daemon.ini');
 	
 	function NOW() {

@@ -79,7 +79,7 @@ class Valve
 			} else {
 				$title = $this->params["General"]["Name"] . " For unknown reason";
 			}
-			exec("echo ' ' | mail -s 'PI Open $title' micronen@gmail.com");
+			//exec("echo ' ' | mail -s 'PI Open $title' micronen@gmail.com");
 		}
 	}
 
@@ -99,7 +99,7 @@ class Valve
 				$duration = $duration->format(self::DURATIONLONGFORMAT);
 			}			
 			
-			exec("echo ' ' | mail -s 'PI Close " . $this->params["General"]["Name"] . " after $duration' micronen@gmail.com");
+			//exec("echo ' ' | mail -s 'PI Close " . $this->params["General"]["Name"] . " after $duration' micronen@gmail.com");
 		}
 	}
 

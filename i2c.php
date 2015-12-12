@@ -11,7 +11,7 @@ class I2C
 	function __construct($addr, $bus = 1) {	 // the i2c bus ( 0 on PI Ver. A, 1 on PI Ver B )	
 		$this->addr = $bus . ' ' . $addr;
 		if (!$this->check_hw()) {
-			$this->hwsim = '/var/www-data/valves/i2c_hwsim' . $bus . '_' . $addr . '.txt';
+			$this->hwsim = '/var/www/html/valves/i2c_hwsim' . $bus . '_' . $addr . '.txt';
 			$f = fopen($this->hwsim, 'r');
 			if ($f === false) {
 				$f = fopen($this->hwsim, 'w');

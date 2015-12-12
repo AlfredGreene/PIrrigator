@@ -23,12 +23,23 @@
 			echo "</button></form></td></tr>";
 		}
 		?>		
-		<form action='' method='post' name='GlobalActions'>
-		<tr><td style='padding:5px'><input type="submit" class="menubutton2" style='margin:auto' name="GlobalAction" value="Enable automatic timers"</td></tr>
-		<tr><td style='padding:5px'><input type="submit" class="menubutton2" style='margin:auto' name="GlobalAction" value="Disable automatic timers"</td></tr>
-		<tr><td style='padding:5px'><input type="submit" class="menubutton2" style='margin:auto' name="GlobalAction" value="Open all valves"></td></tr>
-		<tr><td style='padding:5px'><input type="submit" class="menubutton2" style='margin:auto' name="GlobalAction" value="Close all valves"></td></tr>
-		</form></table>
+		<tr><td style='padding:5px'>
+			<form action='' method='post' name='GlobalActions'>
+			<input type="submit" class="menubutton2" style='margin:auto' name="GlobalAction" value="Enable automatic timers"</td></form>
+		</tr>
+		<tr><td style='padding:5px'>
+			<form action='' method='post' name='GlobalActions'>
+			<input type="submit" class="menubutton2" style='margin:auto' name="GlobalAction" value="Disable automatic timers"</td></form>
+		</tr>
+		<tr><td style='padding:5px'>
+			<form action='' method='post' name='GlobalActions'>
+			<input type="submit" class="menubutton2" style='margin:auto' name="GlobalAction" value="Open all valves"</td></form>
+		</tr>
+		<tr><td style='padding:5px'>
+			<form action='' method='post' name='GlobalActions'>
+			<input type="submit" class="menubutton2" style='margin:auto' name="GlobalAction" value="Close all valves"</td></form>
+		</tr>
+		</table>
 		<?php
 	}
 	
@@ -72,10 +83,10 @@
 	<meta charset="UTF-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 	<title>Michaeli's PI Irrigation</title>
- 	<link href="css/style.css" rel="stylesheet" type="text/css" />
+ 	<link href="style.css" rel="stylesheet" type="text/css" />
 	<meta name="keywords" content="Raspberry PI Irrigation Michaeli" />
 	<meta name="description" content="Irrigation system status & control, by Ronen Michaeli 2013" />
-	<script type="text/javascript" src="js/jquery-2.0.3.js"></script>
+	<script type="text/javascript" src="jquery-2.0.3.js"></script>
 </head>
 <body>
 	<div class="header">

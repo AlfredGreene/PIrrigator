@@ -17,10 +17,29 @@ Hardware part includes:
  * 8 Channel 5V Relay Module (10$ in DealExtream: http://dx.com/p/171630 )
 
 Installation instructions:
+ ***** NOT Updated ******
+
 1. Get a Raspberry PI and connect it to your local network.
 2. On the PI, install Apache, PHP, Samba, FTP, I2C...
    Setup apache and PHP
-   apt-get install apache2 apache2-doc apache2-utils libapache2-mod-php5 php5 php-pear php5-xcache i2c-tools
+   apt-get install apache2 php5 php-pear libapache2-mod-php5 i2c-tools
+
+3. add these lines to /etc/apache2/mods-enabled/php5.conf
+<FilesMatch ".+\.html$">
+    SetHandler application/x-httpd-php
+</FilesMatch>
+
+4. Enable I2C - follow https://www.abelectronics.co.uk/kb/article/1/i2c--smbus-and-raspbian-linux
+chmod 777 /var/i2c*
+
+5. Set dynamic DNS
+add systemd service to run the following command every 5 minutes
+wget -O - http://freedns.afraid.org/dynamic/update.php?WkNicER4UGprSUxEVGl3eW1VY0Q6MTE2MTcyNTM=  &> /tmp/freedns_michaeli_mooo_com.log
+
+
+  
+   
+   
    a. nano /etc/apache2/apache2.conf
      add to the end:
 # Set ServerName

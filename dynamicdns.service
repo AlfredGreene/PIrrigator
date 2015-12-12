@@ -1,0 +1,10 @@
+[Unit]
+Description=Dynamic DNS
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/wget -O - http://freedns.afraid.org/dynamic/update.php?WkNicER4UGprSUxEVGl3eW1VY0Q6MTE2MTcyNTM=
+
+[Install]
+WantedBy=multi-user.target
+
