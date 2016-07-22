@@ -3,12 +3,19 @@ include_once 'valve.php';
 
 class ValveDisplay extends Valve
 {
-	public $DurationArray;
+	public $DaysInBetweenArray;
+	public $TimeDurationArray;
 	public $YesNoArray = [true=>'Yes', false=>'No'];
 
 	function __construct($filename) {
 		parent::__construct($filename);
-		for ($i=1;$i<=50;$i++) $this->DurationArray["P{$i}D"]=$i;
+		for ($i=1;$i<=50;$i++) $this->DaysInBetweenArray["P{$i}D"]=$i;
+		
+		$TimeDurations = array("PT5M","PT10M","PT15M","PT30M","PT1H0M","PT1H30M","PT2H0M");
+		foreach ($TimeDurations as $T) {
+			$S = (new DateInterval($T))->format(self::DURATIONFORMAT);
+			$this->TimeDurationArray[$S] = $S;
+		}
 	}
 
 	function GenerateMainMenuItem() {
@@ -102,12 +109,12 @@ class ValveDisplay extends Valve
 			<?php
 			$this->AddSelectHeaderLine('Use automatic scheduling?', 'Auto', $this->YesNoArray, $this->params['Status']['Auto']);
 			$this->AddFormTimeLine('Open at', 'AutoAt', $this->FormatAutoTime());
-			$this->AddSelectLine('Days in between', 'AutoInterval', $this->DurationArray, $this->params['Auto']['Interval']);
-			$this->AddFormTimeLine('Open for', 'AutoDuration', $this->FormatAutoDuration());
+			$this->AddSelectLine('Days in between', 'AutoInterval', $this->DaysInBetweenArray, $this->params['Auto']['Interval']);
+			$this->AddSelectLine('Open for', 'AutoDuration', $this->TimeDurationArray, $this->FormatAutoDuration());
 
 			$this->AddSelectHeaderLine('Use manual scheduling?', 'Manual', $this->YesNoArray, $this->params['Status']['Manual']);
 			$this->AddFormDateTimeLine('Open at', 'ManualAtDate', $this->FormatManualDate(), 'ManualAtTime', $this->FormatManualTime());
-			$this->AddFormTimeLine('Open for', 'ManualDuration', $this->FormatManualDuration());
+			$this->AddSelectLine('Open for', 'ManualDuration', $this->TimeDurationArray, $this->FormatManualDuration());
 
 		 	$this->AddSeperatorLine();
 			?>
@@ -132,7 +139,7 @@ class ValveDisplay extends Valve
 		if (!empty($NameTime)) echo "<input type=\"time\" name=\"$NameTime\" value=\"$ValueTime\">";
 		echo "</td></tr>";
 	}
-
+	
 	public static function AddSelectLine($Text, $Name, $Array, $Value) {
 		echo "<tr><td></td><td>$Text</td><td><select name=\"$Name\">";
 		self::SelectArray($Array, $Value);
