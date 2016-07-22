@@ -22,7 +22,7 @@ Installation instructions:
 1. Get a Raspberry PI and connect it to your local network.
 2. On the PI, install Apache, PHP, Samba, FTP, I2C...
    Setup apache and PHP
-   apt-get install apache2 php5 php-pear libapache2-mod-php5 i2c-tools
+   apt-get install apache2 php5 i2c-tools php-pear
 
 3. add these lines to /etc/apache2/mods-enabled/php5.conf
 <FilesMatch ".+\.html$">
@@ -30,32 +30,14 @@ Installation instructions:
 </FilesMatch>
 
 4. Enable I2C - follow https://www.abelectronics.co.uk/kb/article/1/i2c--smbus-and-raspbian-linux
-chmod 777 /var/i2c*
+chmod 777 /dev/i2c*
 
 5. Set dynamic DNS
 add systemd service to run the following command every 5 minutes
 wget -O - http://freedns.afraid.org/dynamic/update.php?WkNicER4UGprSUxEVGl3eW1VY0Q6MTE2MTcyNTM=  &> /tmp/freedns_michaeli_mooo_com.log
 
 
-  
-   
-   
-   a. nano /etc/apache2/apache2.conf
-     add to the end:
-# Set ServerName
-ServerName localhost
 
-# Add PHP in HTML support
-AddHandler application/x-httpd-php .html
-   b. apachectl -k restart
-   
-   c. enable I2C	  
-	  sudo nano /etc/modules
-           i2c-bcm2708
-           i2c-dev
-	  if any problems see https://www.raspberrypi.org/forums/viewtopic.php?t=97314   
-		   
-   
    Add root SMB share:
    sudo apt-get install samba samba-common-bin winbind smbclient
    a. nano /etc/samba/smb.conf
@@ -70,11 +52,35 @@ force group = users
 create mask = 0660
 directory mask = 0771
 read only = no
-   b. usermod xbian -G users
-   c. smbpasswd -a xbian   
-   d. nano /etc/nsswitch.conf
-      add wins to end of hosts line
-   e. /etc/init.d/samba restart
+   b. usermod pi -G users
+   c. smbpasswd -a pi   
+   d. sudo service smbd restart
+
+??   d. nano /etc/nsswitch.conf
+??      add wins to end of hosts line
+
+   
+   a. nano /etc/apache2/apache2.conf
+     add to the end:
+# Set ServerName
+ServerName localhost
+
+# Add PHP in HTML support
+AddHandler application/x-httpd-php .html
+
+   b. apachectl -k restart
+
+
+
+
+   
+   c. enable I2C	  
+	  sudo nano /etc/modules
+           i2c-bcm2708
+           i2c-dev
+	  if any problems see https://www.raspberrypi.org/forums/viewtopic.php?t=97314   
+		   
+   
 
    Add root FTP share
    apt-get install vsftpd
